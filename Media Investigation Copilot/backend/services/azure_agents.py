@@ -264,7 +264,6 @@ async def _run_via_foundry(company: str) -> dict[str, Any]:
 
         payload: dict[str, Any] = {
             "input": company,
-            "background": True,
             "conversation": conversation_id,
             "agent_reference": agent_reference,
         }
