@@ -136,7 +136,7 @@ class AgentReport(WorkflowModel):
     subject_reports: List[SubjectReport] = Field(min_length=1)
     qa_status: str
     qa_warnings: List[str] = Field(default_factory=list)
-    mode: Literal["live"] = "live"
+    mode: Literal["live", "local"] = "local"
 
 
 def validate_agent_report(data: dict[str, Any]) -> dict[str, Any]:

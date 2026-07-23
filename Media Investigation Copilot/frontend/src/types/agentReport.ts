@@ -1,5 +1,5 @@
 /**
- * Types for the JSON report produced by the 4-agent Azure workflow.
+ * Types for the structured report returned by the investigation backend.
  * Only the fields consumed by the agent dashboard are typed here; the raw
  * JSON may contain additional fields, which are preserved but ignored.
  */

@@ -126,6 +126,45 @@ def _responses_output_text(data: dict[str, Any]) -> str:
     return "\n".join(part for part in parts if part).strip()
 
 
+def _final_report_from_response(data: dict[str, Any]) -> dict[str, Any] | None:
+    """Find the final dashboard report in completed assistant message items."""
+
+    if isinstance(data.get("response"), dict):
+        data = data["response"]
+
+    required_keys = {
+        "case_id",
+        "input_name",
+        "assessment_date",
+        "subject_reports",
+        "qa_status",
+    }
+    messages = [
+        item
+        for item in data.get("output", []) or []
+        if isinstance(item, dict)
+        and item.get("type") == "message"
+        and item.get("role") == "assistant"
+        and item.get("status") in (None, "completed")
+    ]
+    for item in reversed(messages):
+        for block in reversed(item.get("content", []) or []):
+            if not isinstance(block, dict):
+                continue
+            text_value = block.get("text")
+            if isinstance(text_value, dict):
+                text_value = text_value.get("value")
+            if not isinstance(text_value, str) or not text_value.strip():
+                continue
+            try:
+                candidate = _extract_json(text_value)
+            except (json.JSONDecodeError, TypeError, ValueError):
+                continue
+            if required_keys.issubset(candidate) and isinstance(candidate.get("subject_reports"), list):
+                return candidate
+    return None
+
+
 def _get_entra_token(scope: str) -> str:
     from azure.identity import DefaultAzureCredential
 
@@ -208,9 +247,8 @@ async def _request(
             hint="Check the project endpoint, network connection, firewall, and Azure service availability.",
         ) from exc
 
-    _raise_for_foundry_error(response, workflow_name)
     try:
-        return response.json()
+        data = response.json()
     except ValueError as exc:
         raise AzureWorkflowError(
             "AZURE_CONNECTION_FAILED",
@@ -218,6 +256,13 @@ async def _request(
             "The Azure endpoint responded, but its response was not valid JSON.",
             hint="Confirm that FOUNDRY_PROJECT_ENDPOINT points to a Microsoft Foundry project endpoint.",
         ) from exc
+
+    # A workflow can finish Agent 4 and include its full report, then fail while
+    # Foundry serializes the workflow envelope. Preserve a strictly recognizable
+    # final report instead of discarding useful completed output with the HTTP 500.
+    if response.status_code >= 400 and _final_report_from_response(data) is None:
+        _raise_for_foundry_error(response, workflow_name)
+    return data
 
 
 async def _run_via_foundry(company: str) -> dict[str, Any]:
@@ -294,6 +339,20 @@ async def _run_via_foundry(company: str) -> dict[str, Any]:
                 workflow_name=settings.foundry_agent_name,
             )
 
+    final_report = _final_report_from_response(data)
+    if final_report is not None:
+        try:
+            final_report["mode"] = "live"
+            return validate_agent_report(final_report)
+        except ValidationError as exc:
+            raise AzureWorkflowError(
+                "WORKFLOW_OUTPUT_INVALID",
+                "Workflow JSON does not match the dashboard",
+                "Agent 4 returned a final report, but it did not match the dashboard schema.",
+                status_code=502,
+                hint=str(exc)[:800],
+            ) from exc
+
     if data.get("status") in ("failed", "cancelled", "incomplete"):
         azure_error = data.get("error") or data.get("incomplete_details") or {}
         raise AzureWorkflowError(
@@ -327,9 +386,10 @@ async def _run_via_foundry(company: str) -> dict[str, Any]:
                 "Azure ran the workflow, but the final reporting agent did not return the dashboard report JSON.",
                 status_code=502,
                 hint=(
-                    "In the deployed workflow, pass =Local.LatestMessage into "
-                    "4RiskScoringAndFinalReportingAgent and map its final messages output. "
-                    "The dashboard requires assessment_date, subject_reports, and qa_status."
+                    "Foundry did not expose Agent 4's completed report in the Responses output. "
+                    "Send the final report as message text with autoSend enabled; do not bind the "
+                    "nested report to a typed workflow response variable. The dashboard requires "
+                    "assessment_date, subject_reports, and qa_status."
                 ),
             )
         return validate_agent_report(report)

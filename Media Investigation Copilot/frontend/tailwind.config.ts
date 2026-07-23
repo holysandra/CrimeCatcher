@@ -7,10 +7,10 @@ const config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["\"IBM Plex Sans\"", "ui-sans-serif", "system-ui", "-apple-system", "sans-serif"],
+        sans: ["Inter", "\"Helvetica Neue\"", "Arial", "ui-sans-serif", "system-ui", "-apple-system", "sans-serif"],
         serif: ["\"Source Serif 4\"", "ui-serif", "Georgia", "serif"],
-        display: ["\"Source Serif 4\"", "ui-serif", "Georgia", "serif"],
-        button: ["\"Libre Franklin\"", "ui-sans-serif", "system-ui", "-apple-system", "sans-serif"]
+        display: ["Inter", "\"Helvetica Neue\"", "Arial", "ui-sans-serif", "system-ui", "-apple-system", "sans-serif"],
+        button: ["Inter", "\"Helvetica Neue\"", "Arial", "ui-sans-serif", "system-ui", "-apple-system", "sans-serif"]
       },
       colors: {
         border: "hsl(var(--border))",

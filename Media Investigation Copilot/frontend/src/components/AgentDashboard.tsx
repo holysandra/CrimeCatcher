@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "react";
 import {
   AlertTriangle,
+  Archive,
   Bot,
   Building2,
   CheckCircle2,
@@ -8,15 +9,25 @@ import {
   Flag,
   Landmark,
   MapPinned,
+  SearchCheck,
   ShieldAlert,
+  Siren,
   TriangleAlert,
-  UserCheck
+  UserCheck,
+  UserRound
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { Link } from "@/router";
+import {
+  upsertReviewedCase,
+  type CasePriority,
+  type CaseRecommendation,
+  type EntityKind
+} from "@/store/caseStore";
 import type { AgentReport, Matter, SubjectReport } from "@/types/agentReport";
 import {
   aggregateTypologies,
@@ -26,19 +37,27 @@ import {
   flattenTimeline,
   formatDate,
   getSubject,
-  profileValue,
   riskVariant,
   stageVariant
 } from "@/lib/agentReportAdapter";
 
 /**
- * Renders a full adverse-media dashboard from a 4-agent Azure workflow report.
+ * Renders a full adverse-media dashboard from a structured investigation report.
  * Mirrors the layout of the original deterministic dashboard so the two are
  * directly comparable.
  */
-export function AgentDashboard({ report }: { report: AgentReport }) {
+export function AgentDashboard({
+  report,
+  entityKind = "Entity",
+  geographicRegion = ""
+}: {
+  report: AgentReport;
+  entityKind?: EntityKind;
+  geographicRegion?: string;
+}) {
   const subject = getSubject(report);
   const [copied, setCopied] = useState<string | null>(null);
+  const [savedRecommendation, setSavedRecommendation] = useState<CaseRecommendation | null>(null);
 
   async function copyText(label: string, text: string) {
     try {
@@ -61,16 +80,23 @@ export function AgentDashboard({ report }: { report: AgentReport }) {
   return (
     <section className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
       <div id="overview" className="scroll-mt-28">
-        <SummaryDashboard subject={subject} qaStatus={report.qa_status} />
+        <SummaryDashboard subject={subject} qaStatus={report.qa_status} entityKind={entityKind} />
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_390px]">
         <div className="space-y-6">
           <div id="summary" className="scroll-mt-28">
-            <ExecutiveSummary subject={subject} report={report} copyText={copyText} copied={copied} />
+            <ExecutiveSummary
+              subject={subject}
+              report={report}
+              entityKind={entityKind}
+              copyText={copyText}
+              copied={copied}
+            />
           </div>
+          <FinalConclusionPanel subject={subject} copyText={copyText} copied={copied} />
           <div id="profile" className="scroll-mt-28">
-            <EntityProfilePanel subject={subject} />
+            <EntityProfilePanel entityKind={entityKind} />
           </div>
           <div id="matters" className="scroll-mt-28">
             <MattersPanel matters={subject.matters} />
@@ -85,7 +111,6 @@ export function AgentDashboard({ report }: { report: AgentReport }) {
           <div id="sources" className="scroll-mt-28">
             <SourcesPanel subject={subject} />
           </div>
-          <FinalConclusionPanel subject={subject} copyText={copyText} copied={copied} />
         </div>
 
         <aside className="space-y-6">
@@ -98,16 +123,138 @@ export function AgentDashboard({ report }: { report: AgentReport }) {
           <ExcludedMattersPanel subject={subject} />
         </aside>
       </div>
+      <ReviewRecommendationPanel
+        subject={subject}
+        entityKind={entityKind}
+        geographicRegion={geographicRegion}
+        savedRecommendation={savedRecommendation}
+        onRecommend={(recommendation) => {
+          const level = subject.subject_risk_assessment.risk_level.toLowerCase();
+          const priority: CasePriority =
+            level.includes("critical") ? "Critical" : level.includes("high") ? "High" : level.includes("medium") ? "Medium" : "Low";
+          upsertReviewedCase({
+            subjectName: subject.matched_name,
+            entityKind,
+            geographicRegion: geographicRegion || subject.focal_geography.jurisdiction || "Global",
+            priority,
+            riskTypology: aggregateTypologies(subject.matters)
+              .map((typology) => typology.name)
+              .slice(0, 3)
+              .join(" / ") || "Adverse media",
+            riskScore: subject.subject_risk_assessment.subject_risk_score,
+            recommendation
+          });
+          setSavedRecommendation(recommendation);
+        }}
+      />
     </section>
   );
 }
 
-function SummaryDashboard({ subject, qaStatus }: { subject: SubjectReport; qaStatus: string }) {
+function ReviewRecommendationPanel({
+  subject,
+  entityKind,
+  geographicRegion,
+  savedRecommendation,
+  onRecommend
+}: {
+  subject: SubjectReport;
+  entityKind: EntityKind;
+  geographicRegion: string;
+  savedRecommendation: CaseRecommendation | null;
+  onRecommend: (recommendation: CaseRecommendation) => void;
+}) {
+  const actions: {
+    value: CaseRecommendation;
+    title: string;
+    detail: string;
+    icon: ReactNode;
+    className: string;
+  }[] = [
+    {
+      value: "Recommend for closure with minimum risk",
+      title: "Recommend closure",
+      detail: "Minimum risk; move the case to Closed.",
+      icon: <Archive className="h-5 w-5" />,
+      className: "border-emerald-300 bg-emerald-50 text-emerald-900 hover:bg-emerald-100 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-100"
+    },
+    {
+      value: "Recommend for investigator review",
+      title: "Investigator review",
+      detail: "Keep the case active for human review.",
+      icon: <SearchCheck className="h-5 w-5" />,
+      className: "border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-100"
+    },
+    {
+      value: "Recommend for escalation",
+      title: "Recommend escalation",
+      detail: "Move the case to the escalation queue.",
+      icon: <Siren className="h-5 w-5" />,
+      className: "border-red-300 bg-red-50 text-red-900 hover:bg-red-100 dark:border-red-800 dark:bg-red-950 dark:text-red-100"
+    }
+  ];
+
+  return (
+    <Card className="overflow-hidden border-primary/25">
+      <CardHeader className="border-b bg-primary/[0.06]">
+        <CardTitle>AI Agent Review Recommendation</CardTitle>
+        <p className="text-sm text-muted-foreground">
+          Record the final analyst recommendation for {subject.matched_name} ({entityKind}
+          {geographicRegion ? ` · ${geographicRegion}` : ""}). The selection immediately updates the investigation queue.
+        </p>
+      </CardHeader>
+      <CardContent className="min-w-0 pt-5">
+        <div className="grid gap-3 md:grid-cols-3">
+          {actions.map((action) => (
+            <button
+              key={action.value}
+              type="button"
+              onClick={() => onRecommend(action.value)}
+              className={cn(
+                "rounded-xl border p-4 text-left transition-all hover:-translate-y-0.5 hover:shadow-md",
+                action.className,
+                savedRecommendation === action.value && "ring-2 ring-primary ring-offset-2"
+              )}
+            >
+              <span className="flex items-center gap-2 font-display font-bold">
+                {action.icon}
+                {action.title}
+              </span>
+              <span className="mt-2 block text-xs leading-5 opacity-80">{action.detail}</span>
+            </button>
+          ))}
+        </div>
+        {savedRecommendation ? (
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-primary/20 bg-primary/[0.05] p-3">
+            <p className="text-sm font-semibold">Saved: {savedRecommendation}</p>
+            <Link to="/aiagent" className="text-sm font-bold text-primary hover:underline">
+              View updated queue →
+            </Link>
+          </div>
+        ) : null}
+      </CardContent>
+    </Card>
+  );
+}
+
+function SummaryDashboard({
+  subject,
+  qaStatus,
+  entityKind
+}: {
+  subject: SubjectReport;
+  qaStatus: string;
+  entityKind: EntityKind;
+}) {
   const { red, yellow, green } = flagCounts(subject.matters);
   const risk = subject.subject_risk_assessment;
   return (
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-      <SummaryCard icon={<Landmark className="h-5 w-5" />} label="Entity" value={subject.matched_name} />
+      <SummaryCard
+        icon={entityKind === "Individual" ? <UserRound className="h-5 w-5" /> : <Landmark className="h-5 w-5" />}
+        label={entityKind}
+        value={subject.matched_name}
+      />
       <SummaryCard
         icon={<AlertTriangle className="h-5 w-5" />}
         label="Subject Risk Score"
@@ -129,11 +276,13 @@ function SummaryDashboard({ subject, qaStatus }: { subject: SubjectReport; qaSta
 function ExecutiveSummary({
   subject,
   report,
+  entityKind,
   copyText,
   copied
 }: {
   subject: SubjectReport;
   report: AgentReport;
+  entityKind: EntityKind;
   copyText: (label: string, text: string) => void;
   copied: string | null;
 }) {
@@ -151,8 +300,8 @@ function ExecutiveSummary({
       <CardContent className="space-y-4 pt-5">
         <p className="text-base leading-7">{pe.overall_risk_assessment}</p>
         <div className="grid gap-3 md:grid-cols-3">
-          <Metric label="Profile Type" value={subject.final_profile.profile_type} />
-          <Metric label="Subject Type" value={subject.subject_type} />
+          <Metric label="Profile Type" value={entityKind} />
+          <Metric label="Subject Type" value={entityKind} />
           <Metric label="Match Status" value={subject.match_status} />
           <Metric
             label="Identity Confidence"
@@ -173,42 +322,19 @@ function ExecutiveSummary({
   );
 }
 
-const PROFILE_TILE_FIELDS: { field: string; label: string }[] = [
-  { field: "legal_name", label: "Legal Name" },
-  { field: "entity_type_or_legal_form", label: "Entity Type / Legal Form" },
-  { field: "industry_or_sector", label: "Industry / Sector" },
-  { field: "line_of_business", label: "Line of Business" },
-  { field: "official_website", label: "Official Website" },
-  { field: "key_people", label: "Key People" }
-];
-
-function EntityProfilePanel({ subject }: { subject: SubjectReport }) {
-  const fields = subject.final_profile.sourced_profile_fields;
+function EntityProfilePanel({ entityKind }: { entityKind: EntityKind }) {
   return (
     <Card>
       <CardHeader className="border-b bg-secondary/50">
         <CardTitle>
           <span className="inline-flex items-center gap-2">
-            <Building2 className="h-4 w-4" />
-            Entity Profile
+            {entityKind === "Individual" ? <UserRound className="h-4 w-4" /> : <Building2 className="h-4 w-4" />}
+            {entityKind} Profile
           </span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4 pt-5">
-        <p className="text-sm leading-7 text-muted-foreground">{subject.final_profile.profile_summary}</p>
-        <div className="grid gap-3 md:grid-cols-2">
-          {PROFILE_TILE_FIELDS.map((tile) => (
-            <Metric key={tile.field} label={tile.label} value={profileValue(fields, tile.field)} />
-          ))}
-        </div>
-        <div className="grid gap-3 md:grid-cols-2">
-          <ChipList label="Products / Services" value={profileValue(fields, "products_or_services")} />
-          <ChipList label="Subsidiaries" value={profileValue(fields, "subsidiaries")} />
-        </div>
-        <div className="rounded-lg border bg-background shadow-inset-soft p-3">
-          <p className="text-[11px] font-semibold uppercase text-muted-foreground">Regulatory Status / Licenses</p>
-          <p className="mt-1 text-sm leading-6">{profileValue(fields, "regulatory_status_or_licenses")}</p>
-        </div>
+      <CardContent className="pt-5">
+        <Metric label="Subject Type" value={entityKind} />
       </CardContent>
     </Card>
   );
@@ -629,14 +755,16 @@ function SummaryCard({
 }) {
   return (
     <Card>
-      <CardContent className="pt-5">
+      <CardContent className="min-w-0 overflow-hidden pt-5">
         <div className="mb-4 flex items-center justify-between">
           <div className="grid h-10 w-10 place-items-center rounded-lg bg-primary/10 text-primary">{icon}</div>
           {badge ? <Badge variant={badge}>{value}</Badge> : null}
         </div>
         <p className="font-display text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</p>
-        <p className={cn("mt-2 truncate font-display text-2xl font-bold", valueClass)}>{value}</p>
-        {sub ? <p className="mt-1 truncate text-xs text-muted-foreground">{sub}</p> : null}
+        <p className={cn("mt-2 min-w-0 font-display text-2xl font-bold [overflow-wrap:anywhere]", valueClass)}>
+          {value}
+        </p>
+        {sub ? <p className="mt-1 min-w-0 text-xs text-muted-foreground [overflow-wrap:anywhere]">{sub}</p> : null}
       </CardContent>
     </Card>
   );
@@ -644,48 +772,36 @@ function SummaryCard({
 
 function Metric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border bg-background shadow-inset-soft p-3">
+    <div className="min-w-0 overflow-hidden rounded-lg border bg-background shadow-inset-soft p-3">
       <p className="text-xs font-medium text-muted-foreground">{label}</p>
-      <p className="mt-1 text-lg font-bold">{value}</p>
+      <p className="mt-1 max-w-full text-lg font-bold [overflow-wrap:anywhere]">{value}</p>
     </div>
   );
 }
 
 function MiniFact({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-md bg-secondary/70 p-2 shadow-inset-soft">
+    <div className="min-w-0 overflow-hidden rounded-md bg-secondary/70 p-2 shadow-inset-soft">
       <p className="text-[11px] font-semibold uppercase text-muted-foreground">{label}</p>
-      <p className="mt-1 text-sm">{value}</p>
+      <p className="mt-1 max-w-full text-sm [overflow-wrap:anywhere]">{value}</p>
     </div>
   );
 }
 
-function ChipList({ label, value }: { label: string; value: string }) {
-  const items = value === "—" ? [] : value.split(", ").filter(Boolean);
-  return (
-    <div className="rounded-lg border bg-background shadow-inset-soft p-3">
-      <p className="mb-2 text-[11px] font-semibold uppercase text-muted-foreground">{label}</p>
-      {items.length === 0 ? (
-        <p className="text-sm text-muted-foreground">—</p>
-      ) : (
-        <div className="flex flex-wrap gap-1.5">
-          {items.map((item) => (
-            <Badge key={item} variant="secondary">
-              {item}
-            </Badge>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-/** Small badge shown in the header for validated Azure workflow data. */
+/** Small badge shown in the header for the local public-source workflow. */
 export function ModeBadge({ report }: { report: AgentReport & { mode?: string } }) {
+  if (report.mode === "demo") {
+    return (
+      <Badge variant="orange">
+        <Bot className="mr-1 h-3 w-3" />
+        Curated demo data
+      </Badge>
+    );
+  }
   return (
     <Badge variant="green">
       <Bot className="mr-1 h-3 w-3" />
-      Live Azure workflow
+      Live public sources
     </Badge>
   );
 }

@@ -8,8 +8,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from typing import Any
 
 from models.schemas import AgentInvestigationRequest, InvestigationRequest, InvestigationResponse
-from services.azure_agents import AzureWorkflowError, run_agent_investigation
 from services.live_investigation import run_live_investigation
+from services.local_report import adapt_local_investigation
 
 
 load_dotenv(Path(__file__).resolve().parent / ".env")
@@ -55,20 +55,20 @@ async def investigate(request: InvestigationRequest) -> InvestigationResponse:
 
 @app.post("/agents/investigate")
 async def agents_investigate(request: AgentInvestigationRequest) -> dict[str, Any]:
-    """Run the 4-agent Azure AI Foundry workflow and return its JSON report.
-
-    The workflow output is validated and normalized to the dashboard schema.
-    Azure failures include a stable error code for the frontend.
-    """
+    """Run the non-Azure public-source workflow and return a dashboard report."""
     try:
-        return await run_agent_investigation(request.company)
-    except AzureWorkflowError as exc:
-        raise HTTPException(status_code=exc.status_code, detail=exc.as_detail()) from exc
-    except TimeoutError as exc:
+        result = await run_live_investigation(
+            request.company,
+            entity_type="",
+            jurisdiction="",
+            lookback_days=1095,
+        )
+        return adapt_local_investigation(result)
+    except RuntimeError as exc:
         detail = {
-            "code": "AZURE_CONNECTION_FAILED",
-            "title": "Azure workflow timed out",
-            "message": "Azure did not finish the workflow before the configured timeout.",
-            "hint": "Retry the investigation or increase AZURE_AGENT_TIMEOUT_SECONDS.",
+            "code": "PUBLIC_SOURCE_RETRIEVAL_FAILED",
+            "title": "Live investigation failed",
+            "message": str(exc),
+            "hint": "Check the network connection and public-source availability, then retry.",
         }
-        raise HTTPException(status_code=504, detail=detail) from exc
+        raise HTTPException(status_code=503, detail=detail) from exc

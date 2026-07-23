@@ -17,18 +17,22 @@ import {
 } from "lucide-react";
 
 import { AgentDashboard, ModeBadge } from "@/components/AgentDashboard";
+import { DbBrand } from "@/components/DbBrand";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
+import { isRujaDemoQuery, RUJA_DEMO_REPORT } from "@/data/rujaDemoReport";
 import { cn } from "@/lib/utils";
 import { Link } from "@/router";
+import type { EntityKind } from "@/store/caseStore";
 import type { AgentReport } from "@/types/agentReport";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
+const RUJA_DEMO_DELAY_MS = 8000;
 
-type LoadedReport = AgentReport & { mode: "live" };
+type LoadedReport = AgentReport & { mode: "local" | "demo" };
 
 type WorkflowError = {
   code: string;
@@ -47,16 +51,18 @@ class WorkflowRequestError extends Error {
 }
 
 const STATUS_MESSAGES = [
-  "Dispatching Azure agent workflow...",
-  "Agent 1 — resolving identity and entity profile...",
-  "Agent 2 — retrieving official sources and geography...",
-  "Agent 3 — analysing matters, typologies, and stages...",
-  "Agent 4 — scoring risk and running QA guardrails...",
-  "Formatting agent report..."
+  "Starting live public-source investigation...",
+  "Retrieving current public sources...",
+  "Resolving entity identity and geography...",
+  "Classifying adverse-media findings...",
+  "Applying deterministic risk scoring...",
+  "Formatting the investigation report..."
 ];
 
 export default function App() {
   const [query, setQuery] = useState("Binance");
+  const [entityKind, setEntityKind] = useState<EntityKind>("Entity");
+  const [geographicRegion, setGeographicRegion] = useState("");
   const [report, setReport] = useState<LoadedReport | null>(null);
   const [loading, setLoading] = useState(false);
   const [statusIndex, setStatusIndex] = useState(0);
@@ -70,7 +76,7 @@ export default function App() {
   useEffect(() => {
     if (!loading) return;
     const interval = window.setInterval(() => {
-      setStatusIndex((current) => (current + 1) % STATUS_MESSAGES.length);
+      setStatusIndex((current) => Math.min(current + 1, STATUS_MESSAGES.length - 1));
     }, 1200);
     return () => window.clearInterval(interval);
   }, [loading]);
@@ -93,10 +99,19 @@ export default function App() {
     }
 
     setLoading(true);
+    setReport(null);
     setError(null);
     setStatusIndex(0);
 
     try {
+      if (isRujaDemoQuery(trimmed)) {
+        setEntityKind("Individual");
+        setGeographicRegion("Bulgaria / Europe");
+        await new Promise((resolve) => window.setTimeout(resolve, RUJA_DEMO_DELAY_MS));
+        setReport(RUJA_DEMO_REPORT);
+        return;
+      }
+
       const response = await fetch(`${API_BASE_URL}/agents/investigate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -118,7 +133,7 @@ export default function App() {
           code: "BACKEND_UNAVAILABLE",
           title: "Investigation service unavailable",
           message: typeof detail === "string" ? detail : `The backend returned status ${response.status}.`,
-          hint: "Check that the backend is running and can reach Azure."
+          hint: "Check that the backend is running and can reach public sources."
         });
       }
 
@@ -142,7 +157,7 @@ export default function App() {
   }
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.12),transparent_34%),linear-gradient(180deg,hsl(var(--background)),hsl(var(--secondary)))]">
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(0,24,168,0.10),transparent_34%),linear-gradient(180deg,hsl(var(--background)),hsl(var(--secondary)))]">
       <NavBar
         hasReport={Boolean(report)}
         darkMode={darkMode}
@@ -150,31 +165,49 @@ export default function App() {
         onPrint={() => window.print()}
       />
 
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
+      <div
+        className={cn(
+          "mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pt-6 sm:px-6 lg:px-8",
+          report ? "pb-24 sm:pb-28" : "pb-8"
+        )}
+      >
         <section className="flex flex-col gap-2 rounded-xl border bg-card/90 p-5 shadow-terminal backdrop-blur">
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="font-display text-xl font-bold tracking-tight text-foreground md:text-2xl">
-              AI Adverse Media Investigation Copilot
+              dbCrimeCatcher
             </h1>
             <Badge variant="secondary">AFC / Fraud MVP</Badge>
             {report ? <ModeBadge report={report} /> : null}
           </div>
           <p className="text-sm text-muted-foreground">
-            Human-in-the-loop adverse media investigation, powered by a 4-agent Microsoft Azure workflow.
+            Human-in-the-loop adverse media investigation using live public sources and transparent deterministic scoring.
           </p>
         </section>
 
         <ResponsibleAiNotice />
 
         <section id="search" className="scroll-mt-28">
-          <SearchPanel query={query} setQuery={setQuery} loading={loading} investigate={investigate} />
+          <SearchPanel
+            query={query}
+            setQuery={setQuery}
+            entityKind={entityKind}
+            setEntityKind={setEntityKind}
+            geographicRegion={geographicRegion}
+            setGeographicRegion={setGeographicRegion}
+            loading={loading}
+            investigate={investigate}
+          />
         </section>
 
         {error ? <WorkflowErrorPanel error={error} retry={() => investigate()} /> : null}
 
         <LoadingPanel loading={loading} status={STATUS_MESSAGES[statusIndex]} progress={progress} />
 
-        {report ? <AgentDashboard report={report} /> : loading ? null : <EmptyState />}
+        {report ? (
+          <AgentDashboard report={report} entityKind={entityKind} geographicRegion={geographicRegion} />
+        ) : loading ? null : (
+          <EmptyState />
+        )}
       </div>
     </main>
   );
@@ -237,15 +270,7 @@ function NavBar({
   return (
     <header className="sticky top-0 z-40 border-b bg-background/85 shadow-sm backdrop-blur-md">
       <div className="mx-auto flex w-full max-w-7xl items-center gap-3 px-4 py-2.5 sm:px-6 lg:px-8">
-        <div className="flex shrink-0 items-center gap-2.5">
-          <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary text-primary-foreground shadow-sm">
-            <ShieldAlert className="h-5 w-5" aria-hidden="true" />
-          </div>
-          <div className="hidden sm:block">
-            <p className="font-display text-sm font-bold leading-tight text-foreground">Adverse Media Copilot</p>
-            <p className="text-[11px] font-medium leading-tight text-muted-foreground">AFC / Fraud MVP</p>
-          </div>
-        </div>
+        <DbBrand compact />
 
         <nav className="flex flex-1 items-center gap-1 overflow-x-auto no-print [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {navItems.map((item) => {
@@ -292,11 +317,19 @@ function NavBar({
 function SearchPanel({
   query,
   setQuery,
+  entityKind,
+  setEntityKind,
+  geographicRegion,
+  setGeographicRegion,
   loading,
   investigate
 }: {
   query: string;
   setQuery: (value: string) => void;
+  entityKind: EntityKind;
+  setEntityKind: (value: EntityKind) => void;
+  geographicRegion: string;
+  setGeographicRegion: (value: string) => void;
   loading: boolean;
   investigate: (event?: FormEvent) => void;
 }) {
@@ -306,8 +339,26 @@ function SearchPanel({
         <CardTitle>Investigation Search Panel</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4 pt-5">
-        <form className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto]" onSubmit={investigate}>
-          <div className="relative">
+        <form className="grid gap-3 lg:grid-cols-[190px_minmax(0,1fr)_minmax(0,1fr)_auto]" onSubmit={investigate}>
+          <label className="space-y-1.5">
+            <span className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+              Subject type <span className="text-destructive">*</span>
+            </span>
+            <select
+              aria-label="Subject type"
+              required
+              value={entityKind}
+              onChange={(event) => setEntityKind(event.target.value as EntityKind)}
+              disabled={loading}
+              className="h-11 w-full rounded-md border bg-background px-3 text-sm font-semibold shadow-inset-soft outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <option value="Entity">Entity</option>
+              <option value="Individual">Individual</option>
+            </select>
+          </label>
+          <label className="space-y-1.5">
+            <span className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Name</span>
+            <div className="relative">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               id="search-query-input"
@@ -318,15 +369,30 @@ function SearchPanel({
               disabled={loading}
             />
           </div>
-          <Button className="h-11" disabled={loading}>
+          </label>
+          <label className="space-y-1.5">
+            <span className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+              Geographic region <span className="font-normal normal-case">(optional)</span>
+            </span>
+            <div className="relative">
+              <MapPinned className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={geographicRegion}
+                onChange={(event) => setGeographicRegion(event.target.value)}
+                placeholder="e.g. Europe, Germany"
+                className="pl-10"
+                disabled={loading}
+              />
+            </div>
+          </label>
+          <Button className="h-11 self-end" disabled={loading}>
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bot className="h-4 w-4" />}
             Run Live Investigation
           </Button>
         </form>
         <p className="text-xs leading-5 text-muted-foreground">
-          Pressing run triggers the 4-agent Azure AI Foundry workflow. It returns a structured JSON report that populates
-          the dashboard below. This screen uses live Azure results only and shows a blocking error if Azure cannot run the
-          configured workflow.
+          Subject type and geographic region are review metadata only and are not sent to the investigation service. The
+          name is used to retrieve public sources and populate the dashboard below.
         </p>
       </CardContent>
     </Card>
@@ -349,7 +415,6 @@ function ResponsibleAiNotice() {
 }
 
 function WorkflowErrorPanel({ error, retry }: { error: WorkflowError; retry: () => void }) {
-  const workflowMissing = error.code === "WORKFLOW_NOT_FOUND";
   return (
     <section
       role="alert"
@@ -361,7 +426,7 @@ function WorkflowErrorPanel({ error, retry }: { error: WorkflowError; retry: () 
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-xs font-black uppercase tracking-[0.2em] text-red-700 dark:text-red-300">
-            {workflowMissing ? "Workflow configuration error" : "Live Azure investigation failed"}
+            Live investigation failed
           </p>
           <h2 className="mt-1 font-display text-2xl font-black text-red-950 dark:text-red-50">{error.title}</h2>
           <p className="mt-2 text-base leading-7 text-red-900 dark:text-red-100">{error.message}</p>
@@ -373,7 +438,7 @@ function WorkflowErrorPanel({ error, retry }: { error: WorkflowError; retry: () 
           <p className="mt-3 font-mono text-xs font-semibold text-red-700 dark:text-red-300">Error code: {error.code}</p>
         </div>
         <Button type="button" variant="outline" onClick={retry} className="border-red-400 text-red-800 dark:text-red-100">
-          Retry live workflow
+          Retry investigation
         </Button>
       </div>
     </section>
@@ -407,10 +472,10 @@ function EmptyState() {
         <div className="mx-auto grid h-14 w-14 place-items-center rounded-lg bg-primary/10 text-primary">
           <Bot className="h-7 w-7" />
         </div>
-        <h2 className="mt-4 font-display text-xl font-bold">Ready to run the agent workflow</h2>
+        <h2 className="mt-4 font-display text-xl font-bold">Ready to run a live investigation</h2>
         <p className="mt-2 text-sm leading-6 text-muted-foreground">
-          Enter a company or person and press Run Live Investigation. The 4-agent Azure workflow will build the profile,
-          retrieve sources, classify matters and typologies, score risk, and return a report to populate this dashboard.
+          Choose Individual or Entity, enter a name, and press Run Live Investigation. The service will retrieve public sources, build the
+          profile, classify matters and typologies, score risk, and populate this dashboard.
         </p>
       </div>
     </section>

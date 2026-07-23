@@ -8,20 +8,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { navigate } from "@/router";
-import { addCase, type CaseStatus } from "@/store/caseStore";
+import {
+  DEMO_ASSIGNEES,
+  addCase,
+  type CasePriority,
+  type CaseStatus,
+  type EntityKind
+} from "@/store/caseStore";
 
-const ENTITY_TYPES = [
-  "Company",
-  "Individual",
-  "Financial Institution",
-  "Payment / E-money Firm",
-  "Fintech / Payment Company",
-  "Crypto Company",
-  "Charity / NGO",
-  "Government-related Entity",
-  "Trust / Foundation",
-  "Unknown"
-];
+const ENTITY_TYPES: EntityKind[] = ["Entity", "Individual"];
 
 const RISK_TYPOLOGIES = [
   "Money Laundering",
@@ -39,29 +34,25 @@ const RISK_TYPOLOGIES = [
 const todayISO = () => new Date().toISOString().slice(0, 10);
 
 type FormState = {
-  company: string;
-  headquarters: string;
-  jurisdiction: string;
-  entityType: string;
-  industry: string;
-  task: string;
+  subjectName: string;
+  geographicRegion: string;
+  entityKind: EntityKind;
   reportDate: string;
   status: CaseStatus;
-  investigator: string;
+  priority: CasePriority;
+  assignee: string;
   riskTypology: string;
   notes: string;
 };
 
 const EMPTY: FormState = {
-  company: "",
-  headquarters: "",
-  jurisdiction: "",
-  entityType: "Company",
-  industry: "",
-  task: "",
+  subjectName: "",
+  geographicRegion: "",
+  entityKind: "Entity",
   reportDate: todayISO(),
-  status: "In Progress",
-  investigator: "",
+  status: "Queued",
+  priority: "Medium",
+  assignee: DEMO_ASSIGNEES[0],
   riskTypology: "Money Laundering",
   notes: ""
 };
@@ -76,25 +67,21 @@ export default function FormPage() {
 
   function submit(event: FormEvent) {
     event.preventDefault();
-    if (!form.company.trim()) {
-      setError("Company / entity name is required.");
-      return;
-    }
-    if (!form.task.trim()) {
-      setError("Investigation task is required.");
+    if (!form.subjectName.trim()) {
+      setError("Person or entity name is required.");
       return;
     }
     addCase({
-      company: form.company.trim(),
-      headquarters: form.headquarters.trim(),
-      jurisdiction: form.jurisdiction.trim(),
-      entityType: form.entityType,
-      industry: form.industry.trim(),
-      task: form.task.trim(),
+      subjectName: form.subjectName.trim(),
+      geographicRegion: form.geographicRegion.trim(),
+      entityKind: form.entityKind,
       reportDate: form.reportDate,
       status: form.status,
-      investigator: form.investigator.trim(),
+      priority: form.priority,
+      assignee: form.assignee,
       riskTypology: form.riskTypology,
+      riskScore: undefined,
+      recommendation: undefined,
       notes: form.notes.trim()
     });
     navigate("/aiagent");
@@ -129,54 +116,33 @@ export default function FormPage() {
             ) : null}
 
             <form className="space-y-5" onSubmit={submit}>
-              <Fieldset legend="Entity">
-                <Field label="Company / Entity name" required>
+              <Fieldset legend="Subject">
+                <Field label="Person or entity name" required>
                   <Input
-                    value={form.company}
-                    onChange={(event) => update("company", event.target.value)}
-                    placeholder="e.g. Northgate Trading Ltd"
+                    value={form.subjectName}
+                    onChange={(event) => update("subjectName", event.target.value)}
+                    placeholder="e.g. Northgate Trading Ltd or Jane Smith"
                   />
                 </Field>
                 <div className="grid gap-4 md:grid-cols-2">
-                  <Field label="Headquarters">
+                  <Field label="Geographic region">
                     <Input
-                      value={form.headquarters}
-                      onChange={(event) => update("headquarters", event.target.value)}
-                      placeholder="City, Country"
+                      value={form.geographicRegion}
+                      onChange={(event) => update("geographicRegion", event.target.value)}
+                      placeholder="e.g. Europe, Cyprus"
                     />
                   </Field>
-                  <Field label="Primary jurisdiction">
-                    <Input
-                      value={form.jurisdiction}
-                      onChange={(event) => update("jurisdiction", event.target.value)}
-                      placeholder="e.g. Cyprus"
-                    />
-                  </Field>
-                  <Field label="Entity type">
-                    <Select value={form.entityType} onChange={(value) => update("entityType", value)}>
+                  <Field label="Subject type" required>
+                    <Select value={form.entityKind} onChange={(value) => update("entityKind", value as EntityKind)}>
                       {ENTITY_TYPES.map((type) => (
                         <option key={type}>{type}</option>
                       ))}
                     </Select>
                   </Field>
-                  <Field label="Industry / sector">
-                    <Input
-                      value={form.industry}
-                      onChange={(event) => update("industry", event.target.value)}
-                      placeholder="e.g. Commodities Trading"
-                    />
-                  </Field>
                 </div>
               </Fieldset>
 
               <Fieldset legend="Case">
-                <Field label="Investigation task" required>
-                  <Input
-                    value={form.task}
-                    onChange={(event) => update("task", event.target.value)}
-                    placeholder="e.g. Sanctions & AML screening"
-                  />
-                </Field>
                 <div className="grid gap-4 md:grid-cols-2">
                   <Field label="Risk typology">
                     <Select value={form.riskTypology} onChange={(value) => update("riskTypology", value)}>
@@ -186,11 +152,14 @@ export default function FormPage() {
                     </Select>
                   </Field>
                   <Field label="Assigned investigator">
-                    <Input
-                      value={form.investigator}
-                      onChange={(event) => update("investigator", event.target.value)}
-                      placeholder="Analyst name"
-                    />
+                    <Select value={form.assignee} onChange={(value) => update("assignee", value)}>
+                      {DEMO_ASSIGNEES.map((name) => <option key={name}>{name}</option>)}
+                    </Select>
+                  </Field>
+                  <Field label="Priority">
+                    <Select value={form.priority} onChange={(value) => update("priority", value as CasePriority)}>
+                      <option>Low</option><option>Medium</option><option>High</option><option>Critical</option>
+                    </Select>
                   </Field>
                   <Field label="Report date">
                     <Input
@@ -201,8 +170,10 @@ export default function FormPage() {
                   </Field>
                   <Field label="Status">
                     <Select value={form.status} onChange={(value) => update("status", value as CaseStatus)}>
-                      <option>In Progress</option>
-                      <option>Complete</option>
+                      <option>Queued</option>
+                      <option>In Review</option>
+                      <option>Escalated</option>
+                      <option>Closed</option>
                     </Select>
                   </Field>
                 </div>

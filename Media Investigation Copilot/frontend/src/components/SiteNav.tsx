@@ -1,5 +1,6 @@
-import { FilePlus2, ShieldAlert, TableProperties } from "lucide-react";
+import { FilePlus2, TableProperties } from "lucide-react";
 
+import { DbBrand } from "@/components/DbBrand";
 import { Link, usePath } from "@/router";
 import { cn } from "@/lib/utils";
 
@@ -15,13 +16,7 @@ export function SiteNav() {
     <header className="sticky top-0 z-40 border-b bg-background/85 shadow-sm backdrop-blur-md">
       <div className="mx-auto flex w-full max-w-7xl items-center gap-3 px-4 py-2.5 sm:px-6 lg:px-8">
         <Link to="/" className="flex shrink-0 items-center gap-2.5">
-          <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary text-primary-foreground shadow-sm">
-            <ShieldAlert className="h-5 w-5" aria-hidden="true" />
-          </div>
-          <div className="hidden sm:block">
-            <p className="font-display text-sm font-bold leading-tight text-foreground">Adverse Media Copilot</p>
-            <p className="text-[11px] font-medium leading-tight text-muted-foreground">AFC / Fraud MVP</p>
-          </div>
+          <DbBrand compact />
         </Link>
 
         <nav className="flex flex-1 items-center gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
