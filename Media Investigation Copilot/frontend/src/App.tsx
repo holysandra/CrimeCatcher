@@ -10,6 +10,7 @@ import {
   Flag,
   Landmark,
   Loader2,
+  MapPinned,
   MessageSquare,
   Moon,
   Network,
@@ -176,38 +177,29 @@ export default function App() {
 
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.12),transparent_34%),linear-gradient(180deg,hsl(var(--background)),hsl(var(--secondary)))]">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-5 sm:px-6 lg:px-8">
-        <header className="flex flex-col gap-4 rounded-lg border bg-card/90 p-4 shadow-terminal backdrop-blur md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-4">
-            <div className="grid h-12 w-12 shrink-0 place-items-center rounded-lg bg-primary text-primary-foreground shadow-sm">
-              <ShieldAlert className="h-7 w-7" aria-hidden="true" />
-            </div>
-            <div>
-              <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-xl font-bold text-foreground md:text-2xl">
-                  AI Adverse Media Investigation Copilot
-                </h1>
-                <Badge variant="secondary">AFC / Fraud MVP</Badge>
-              </div>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Human-in-the-loop adverse media, sanctions, AML, and fraud investigation support.
-              </p>
-            </div>
+      <NavBar
+        investigation={investigation}
+        darkMode={darkMode}
+        toggleDarkMode={() => setDarkMode((value) => !value)}
+        onPrint={() => window.print()}
+      />
+
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
+        <section className="flex flex-col gap-2 rounded-xl border bg-card/90 p-5 shadow-terminal backdrop-blur">
+          <div className="flex flex-wrap items-center gap-2">
+            <h1 className="font-display text-xl font-bold tracking-tight text-foreground md:text-2xl">
+              AI Adverse Media Investigation Copilot
+            </h1>
+            <Badge variant="secondary">AFC / Fraud MVP</Badge>
           </div>
-          <div className="flex items-center gap-2 no-print">
-            <Button variant="outline" size="icon" onClick={() => setDarkMode((value) => !value)} title="Toggle dark mode">
-              {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-            </Button>
-            <Button variant="outline" onClick={() => window.print()} disabled={!investigation}>
-              <Download className="h-4 w-4" />
-              PDF
-            </Button>
-          </div>
-        </header>
+          <p className="text-sm text-muted-foreground">
+            Human-in-the-loop adverse media, sanctions, AML, and fraud investigation support.
+          </p>
+        </section>
 
         <ResponsibleAiNotice />
 
-        <section>
+        <section id="search" className="scroll-mt-28">
           <SearchPanel
             query={query}
             setQuery={setQuery}
@@ -227,32 +219,48 @@ export default function App() {
 
         {investigation ? (
           <section className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
-            <InvestigationDashboard investigation={investigation} />
+            <div id="overview" className="scroll-mt-28">
+              <InvestigationDashboard investigation={investigation} />
+            </div>
 
             <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_390px]">
               <div className="space-y-6">
-                <ExecutiveSummary investigation={investigation} copyText={copyText} copied={copied} />
-                <RetrievedSourcesPanel investigation={investigation} />
+                <div id="summary" className="scroll-mt-28">
+                  <ExecutiveSummary investigation={investigation} copyText={copyText} copied={copied} />
+                </div>
+                <div id="sources" className="scroll-mt-28">
+                  <RetrievedSourcesPanel investigation={investigation} />
+                </div>
                 <TypologyPanel investigation={investigation} />
-                <FindingsPanel
-                  findings={filteredFindings}
-                  flagFilter={flagFilter}
-                  setFlagFilter={setFlagFilter}
-                  typologyFilter={typologyFilter}
-                  setTypologyFilter={setTypologyFilter}
-                  reliabilityFilter={reliabilityFilter}
-                  setReliabilityFilter={setReliabilityFilter}
-                  recencyFilter={recencyFilter}
-                  setRecencyFilter={setRecencyFilter}
-                />
-                <RiskScoreBreakdownPanel investigation={investigation} />
+                <div id="findings" className="scroll-mt-28">
+                  <FindingsPanel
+                    findings={filteredFindings}
+                    flagFilter={flagFilter}
+                    setFlagFilter={setFlagFilter}
+                    typologyFilter={typologyFilter}
+                    setTypologyFilter={setTypologyFilter}
+                    reliabilityFilter={reliabilityFilter}
+                    setReliabilityFilter={setReliabilityFilter}
+                    recencyFilter={recencyFilter}
+                    setRecencyFilter={setRecencyFilter}
+                  />
+                </div>
+                <div id="risk-score" className="scroll-mt-28">
+                  <RiskScoreBreakdownPanel investigation={investigation} />
+                </div>
                 <ScoringMethodologyPanel investigation={investigation} />
-                <TimelinePanel investigation={investigation} />
-                <CaseReportPanel investigation={investigation} copyText={copyText} copied={copied} />
+                <div id="timeline" className="scroll-mt-28">
+                  <TimelinePanel investigation={investigation} />
+                </div>
+                <div id="report" className="scroll-mt-28">
+                  <CaseReportPanel investigation={investigation} copyText={copyText} copied={copied} />
+                </div>
               </div>
 
               <aside className="space-y-6">
-                <InteractiveGeographyRiskMap investigation={investigation} />
+                <div id="map" className="scroll-mt-28">
+                  <InteractiveGeographyRiskMap investigation={investigation} />
+                </div>
                 <SourceReliabilityPanel investigation={investigation} />
                 <HallucinationGuardrailPanel investigation={investigation} />
                 <InnovationFeaturesPanel investigation={investigation} />
@@ -277,6 +285,116 @@ export default function App() {
         )}
       </div>
     </main>
+  );
+}
+
+type NavItem = { id: string; label: string; icon: (props: { className?: string }) => ReactNode };
+
+const BASE_NAV_ITEMS: NavItem[] = [{ id: "search", label: "Search", icon: Search }];
+
+const INVESTIGATION_NAV_ITEMS: NavItem[] = [
+  { id: "overview", label: "Overview", icon: ShieldAlert },
+  { id: "summary", label: "Summary", icon: FileText },
+  { id: "sources", label: "Sources", icon: Newspaper },
+  { id: "findings", label: "Findings", icon: TableProperties },
+  { id: "risk-score", label: "Risk Score", icon: AlertTriangle },
+  { id: "timeline", label: "Timeline", icon: Timer },
+  { id: "map", label: "Map", icon: MapPinned },
+  { id: "report", label: "Report", icon: ClipboardCopy }
+];
+
+function NavBar({
+  investigation,
+  darkMode,
+  toggleDarkMode,
+  onPrint
+}: {
+  investigation: EnhancedInvestigation | null;
+  darkMode: boolean;
+  toggleDarkMode: () => void;
+  onPrint: () => void;
+}) {
+  const navItems = investigation ? [...BASE_NAV_ITEMS, ...INVESTIGATION_NAV_ITEMS] : BASE_NAV_ITEMS;
+  const [activeId, setActiveId] = useState("search");
+
+  useEffect(() => {
+    const sections = navItems
+      .map((item) => document.getElementById(item.id))
+      .filter((element): element is HTMLElement => Boolean(element));
+    if (sections.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible[0]) {
+          setActiveId(visible[0].target.id);
+        }
+      },
+      { rootMargin: "-112px 0px -65% 0px", threshold: [0, 1] }
+    );
+
+    sections.forEach((section) => observer.observe(section));
+    return () => observer.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [investigation]);
+
+  function scrollToSection(id: string) {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (id === "search") {
+      window.setTimeout(() => {
+        const input = document.getElementById("search-query-input") as HTMLInputElement | null;
+        input?.focus({ preventScroll: true });
+      }, 500);
+    }
+  }
+
+  return (
+    <header className="sticky top-0 z-40 border-b bg-background/85 shadow-sm backdrop-blur-md">
+      <div className="mx-auto flex w-full max-w-7xl items-center gap-3 px-4 py-2.5 sm:px-6 lg:px-8">
+        <div className="flex shrink-0 items-center gap-2.5">
+          <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary text-primary-foreground shadow-sm">
+            <ShieldAlert className="h-5 w-5" aria-hidden="true" />
+          </div>
+          <div className="hidden sm:block">
+            <p className="font-display text-sm font-bold leading-tight text-foreground">Adverse Media Copilot</p>
+            <p className="text-[11px] font-medium leading-tight text-muted-foreground">AFC / Fraud MVP</p>
+          </div>
+        </div>
+
+        <nav className="flex flex-1 items-center gap-1 overflow-x-auto no-print [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const active = activeId === item.id;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => scrollToSection(item.id)}
+                className={cn(
+                  "flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md px-2.5 py-1.5 font-display text-sm font-semibold transition-colors",
+                  active ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                )}
+              >
+                <Icon className="h-3.5 w-3.5" />
+                {item.label}
+              </button>
+            );
+          })}
+        </nav>
+
+        <div className="flex shrink-0 items-center gap-2 no-print">
+          <Button variant="outline" size="icon" onClick={toggleDarkMode} title="Toggle dark mode">
+            {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </Button>
+          <Button variant="outline" onClick={onPrint} disabled={!investigation}>
+            <Download className="h-4 w-4" />
+            <span className="hidden md:inline">PDF</span>
+          </Button>
+        </div>
+      </div>
+    </header>
   );
 }
 
@@ -305,6 +423,7 @@ function SearchPanel({
           <div className="relative">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
+              id="search-query-input"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search Company or Person..."
@@ -417,9 +536,9 @@ function TypologyPanel({ investigation }: { investigation: EnhancedInvestigation
       </CardHeader>
       <CardContent className="grid gap-3 pt-5 md:grid-cols-2">
         {visible.map((assessment) => (
-          <div key={assessment.typologyId} className="rounded-lg border bg-background p-4">
+          <div key={assessment.typologyId} className="rounded-lg border bg-background shadow-inset-soft p-4">
             <div className="flex flex-wrap items-start justify-between gap-2">
-              <h3 className="font-semibold">{assessment.name}</h3>
+              <h3 className="font-display font-semibold">{assessment.name}</h3>
               <Badge variant={assessment.severity === "Critical" || assessment.severity === "High" ? "red" : "orange"}>
                 {assessment.detectionStatus}
               </Badge>
@@ -429,7 +548,7 @@ function TypologyPanel({ investigation }: { investigation: EnhancedInvestigation
               <Badge variant="secondary">Severity: {assessment.severity}</Badge>
               <Badge variant="secondary">{assessment.sourceCount} source(s)</Badge>
             </div>
-            <p className="mt-3 text-xs font-semibold uppercase text-muted-foreground">Suggested follow-up</p>
+            <p className="mt-3 font-display text-xs font-semibold uppercase text-muted-foreground">Suggested follow-up</p>
             <p className="mt-1 text-sm">{assessment.suggestedFollowUps[0]}</p>
           </div>
         ))}
@@ -452,12 +571,12 @@ function RetrievedSourcesPanel({ investigation }: { investigation: EnhancedInves
           </p>
         ) : null}
         {sources.map((source) => (
-          <article key={source.id} className="rounded-lg border bg-background p-4">
+          <article key={source.id} className="rounded-lg border bg-background shadow-inset-soft p-4">
             <a
               href={source.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="font-semibold text-primary underline-offset-4 hover:underline"
+              className="font-display font-semibold text-primary underline-offset-4 hover:underline"
             >
               {source.title}
             </a>
@@ -480,15 +599,6 @@ function RetrievedSourcesPanel({ investigation }: { investigation: EnhancedInves
             >
               Open news link
             </a>
-            <details className="mt-3 rounded-md border bg-secondary/40 p-3 text-xs">
-              <summary className="cursor-pointer font-semibold">Debug date parsing</summary>
-              <div className="mt-2 grid gap-2 sm:grid-cols-2">
-                <MiniFact label="Raw provider date" value={source.rawPublishedAt || "Unavailable"} />
-                <MiniFact label="Normalized date" value={source.publishedAt || "Unknown"} />
-                <MiniFact label="Display date" value={source.displayDate} />
-                <MiniFact label="Provider" value={source.provider || "PublicSearch"} />
-              </div>
-            </details>
           </article>
         ))}
       </CardContent>
@@ -566,10 +676,10 @@ function FindingCard({ finding }: { finding: InvestigationFinding }) {
     .join(", ");
 
   return (
-    <article className="rounded-lg border bg-background p-4">
+    <article className="rounded-lg border bg-background shadow-inset-soft p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h3 className="font-semibold">{finding.title}</h3>
+          <h3 className="font-display font-semibold">{finding.title}</h3>
           <p className="mt-1 text-sm leading-6 text-muted-foreground">{finding.summary}</p>
         </div>
         <Badge variant={flagVariant(finding.flag)}>{finding.flag} Flag</Badge>
@@ -613,7 +723,7 @@ function RiskScoreBreakdownPanel({ investigation }: { investigation: EnhancedInv
         <p className="text-sm leading-6 text-muted-foreground">{investigation.riskScore.explanation}</p>
         <div className="overflow-x-auto rounded-lg border">
           <table className="w-full min-w-[760px] text-left text-sm">
-            <thead className="bg-secondary/70 text-xs uppercase text-muted-foreground">
+            <thead className="bg-secondary/70 font-display text-xs uppercase text-muted-foreground">
               <tr>
                 <th className="p-3">Finding</th>
                 <th className="p-3">Typology</th>
@@ -688,11 +798,11 @@ function TimelinePanel({ investigation }: { investigation: EnhancedInvestigation
                 {index + 1}
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                <p className="text-sm font-bold text-primary">{event.displayDate}</p>
+                <p className="font-display text-sm font-bold text-primary">{event.displayDate}</p>
                 <Badge variant={flagVariant(event.flag)}>{event.flag}</Badge>
                 <Badge variant="secondary">{event.typology}</Badge>
               </div>
-              <h3 className="mt-1 font-semibold">{event.title}</h3>
+              <h3 className="mt-1 font-display font-semibold">{event.title}</h3>
               <p className="mt-1 text-sm leading-6 text-muted-foreground">{event.description}</p>
               <p className="mt-1 text-xs text-muted-foreground">{event.source} - {event.jurisdiction ?? "Unknown"}</p>
               {event.sourceUrl || sourceByName.get(event.source) ? (
@@ -743,14 +853,14 @@ function HallucinationGuardrailPanel({ investigation }: { investigation: Enhance
       </CardHeader>
       <CardContent className="space-y-3 pt-5">
         {investigation.hallucinationChecks.map((check) => (
-          <div key={check.label} className="flex items-start gap-3 rounded-lg border bg-background p-3">
+          <div key={check.label} className="flex items-start gap-3 rounded-lg border bg-background shadow-inset-soft p-3">
             {check.passed ? (
               <CheckCircle2 className="mt-0.5 h-4 w-4 text-green-600" />
             ) : (
               <TriangleAlert className="mt-0.5 h-4 w-4 text-orange-600" />
             )}
             <div>
-              <p className="text-sm font-semibold">{check.label}</p>
+              <p className="font-display text-sm font-semibold">{check.label}</p>
               <p className="text-xs leading-5 text-muted-foreground">{check.detail}</p>
             </div>
           </div>
@@ -808,10 +918,10 @@ function ChatbotPanel({
         <CardTitle>Investigation Copilot Chat</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3 pt-5">
-        <div className="rounded-md border border-blue-200 bg-blue-50 p-3 text-sm font-semibold text-blue-800 dark:border-blue-900 dark:bg-blue-950 dark:text-blue-100">
+        <div className="rounded-md border border-blue-200 bg-blue-50 p-3 font-display text-sm font-semibold text-blue-800 dark:border-blue-900 dark:bg-blue-950 dark:text-blue-100">
           No evidence, no conclusion.
         </div>
-        <div className="max-h-96 space-y-3 overflow-y-auto rounded-lg border bg-background p-3">
+        <div className="max-h-96 space-y-3 overflow-y-auto rounded-lg border bg-background shadow-inset-soft p-3">
           {chatMessages.length === 0 ? (
             <p className="text-sm text-muted-foreground">
               Ask: why is this entity high risk, show sanctions concerns, strongest sources, weak evidence, or draft a summary.
@@ -821,7 +931,7 @@ function ChatbotPanel({
             <div key={`${message.role}-${index}`} className={cn("rounded-lg p-3 text-sm", message.role === "analyst" ? "bg-secondary" : "bg-card border")}>
               <p className="mb-1 flex items-center gap-2 font-semibold">
                 {message.role === "analyst" ? <MessageSquare className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
-                {message.role === "analyst" ? "Analyst" : "Copilot"}
+                <span className="font-display">{message.role === "analyst" ? "Analyst" : "Copilot"}</span>
               </p>
               <pre className="whitespace-pre-wrap font-sans leading-6">{message.text}</pre>
             </div>
@@ -866,7 +976,7 @@ function CaseReportPanel({
         </div>
       </CardHeader>
       <CardContent className="pt-5">
-        <pre className="max-h-96 overflow-auto rounded-lg border bg-background p-4 whitespace-pre-wrap font-sans text-sm leading-6">
+        <pre className="max-h-96 overflow-auto rounded-lg border bg-background shadow-inset-soft p-4 whitespace-pre-wrap font-sans text-sm leading-6">
           {report}
         </pre>
       </CardContent>
@@ -911,10 +1021,10 @@ function ResponsibleAiNotice() {
   return (
     <div className="grid gap-3 md:grid-cols-2">
       <div className="rounded-lg border bg-card p-3 text-sm text-muted-foreground">
-        <strong className="text-foreground">Human-in-the-loop:</strong> This tool supports analyst review and does not make final compliance decisions.
+        <strong className="font-display text-foreground">Human-in-the-loop:</strong> This tool supports analyst review and does not make final compliance decisions.
       </div>
       <div className="rounded-lg border bg-card p-3 text-sm text-muted-foreground">
-        <strong className="text-foreground">Evidence-based:</strong> Risk ratings are generated from available evidence and should be validated by a human investigator.
+        <strong className="font-display text-foreground">Evidence-based:</strong> Risk ratings are generated from available evidence and should be validated by a human investigator.
       </div>
     </div>
   );
@@ -947,7 +1057,7 @@ function EmptyState() {
         <div className="mx-auto grid h-14 w-14 place-items-center rounded-lg bg-primary/10 text-primary">
           <Newspaper className="h-7 w-7" />
         </div>
-        <h2 className="mt-4 text-xl font-bold">Ready for AFC adverse media review</h2>
+        <h2 className="mt-4 font-display text-xl font-bold">Ready for AFC Adverse Media Review</h2>
         <p className="mt-2 text-sm leading-6 text-muted-foreground">
           Run a live search to classify typologies, score risk, inspect sources, ask follow-up questions, and generate an analyst report.
         </p>
@@ -970,14 +1080,14 @@ function SummaryCard({
   valueClass?: string;
 }) {
   return (
-    <Card className="transition-transform duration-200 hover:-translate-y-0.5">
+    <Card>
       <CardContent className="pt-5">
         <div className="mb-4 flex items-center justify-between">
           <div className="grid h-10 w-10 place-items-center rounded-lg bg-primary/10 text-primary">{icon}</div>
           {badge ? <Badge variant={badge}>{value}</Badge> : null}
         </div>
-        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</p>
-        {!badge ? <p className={cn("mt-2 truncate text-2xl font-bold", valueClass)}>{value}</p> : null}
+        <p className="font-display text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</p>
+        <p className={cn("mt-2 truncate font-display text-2xl font-bold", valueClass)}>{value}</p>
       </CardContent>
     </Card>
   );
@@ -985,7 +1095,7 @@ function SummaryCard({
 
 function Metric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border bg-background p-3">
+    <div className="rounded-lg border bg-background shadow-inset-soft p-3">
       <p className="text-xs font-medium text-muted-foreground">{label}</p>
       <p className="mt-1 text-lg font-bold">{value}</p>
     </div>
@@ -994,7 +1104,7 @@ function Metric({ label, value }: { label: string; value: string }) {
 
 function MiniFact({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-md bg-secondary/70 p-2">
+    <div className="rounded-md bg-secondary/70 p-2 shadow-inset-soft">
       <p className="text-[11px] font-semibold uppercase text-muted-foreground">{label}</p>
       <p className="mt-1 text-sm">{value}</p>
     </div>
@@ -1006,7 +1116,7 @@ function MiniList({ title, items, icon }: { title: string; items: string[]; icon
     <div>
       <p className="mb-2 flex items-center gap-2 text-sm font-semibold">
         {icon}
-        {title}
+        <span className="font-display">{title}</span>
       </p>
       <ul className="space-y-2">
         {items.map((item) => (
@@ -1035,7 +1145,7 @@ function Select({
       value={value}
       onChange={(event) => onChange(event.target.value)}
       disabled={disabled}
-      className="flex h-11 w-full rounded-md border bg-card px-3 py-2 text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+      className="flex h-11 w-full rounded-md border bg-background px-3 py-2 text-sm shadow-inset-soft outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
     >
       {children}
     </select>

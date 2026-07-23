@@ -6,6 +6,12 @@ const config = {
   content: ["./index.html", "./src/**/*.{ts,tsx}", "../shared/**/*.{ts,tsx}"],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["\"IBM Plex Sans\"", "ui-sans-serif", "system-ui", "-apple-system", "sans-serif"],
+        serif: ["\"Source Serif 4\"", "ui-serif", "Georgia", "serif"],
+        display: ["\"Source Serif 4\"", "ui-serif", "Georgia", "serif"],
+        button: ["\"Libre Franklin\"", "ui-sans-serif", "system-ui", "-apple-system", "sans-serif"]
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -38,7 +44,10 @@ const config = {
         }
       },
       boxShadow: {
-        terminal: "0 18px 60px rgba(15, 23, 42, 0.12)"
+        terminal: "0 18px 60px rgba(15, 23, 42, 0.12)",
+        elevated: "var(--shadow-elevated)",
+        "elevated-hover": "var(--shadow-elevated-hover)",
+        "inset-soft": "var(--shadow-inset)"
       }
     }
   },
