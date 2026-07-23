@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from typing import Any
 
 from models.schemas import AgentInvestigationRequest, InvestigationRequest, InvestigationResponse
-from services.azure_agents import run_agent_investigation
+from services.azure_agents import AzureWorkflowError, run_agent_investigation
 from services.live_investigation import run_live_investigation
 
 
@@ -57,10 +57,18 @@ async def investigate(request: InvestigationRequest) -> InvestigationResponse:
 async def agents_investigate(request: AgentInvestigationRequest) -> dict[str, Any]:
     """Run the 4-agent Azure AI Foundry workflow and return its JSON report.
 
-    Returns the agent report as-is (with an added "mode" field: "live" when the
-    Azure workflow ran, or "sample" when Azure isn't configured yet).
+    The workflow output is validated and normalized to the dashboard schema.
+    Azure failures include a stable error code for the frontend.
     """
     try:
         return await run_agent_investigation(request.company)
-    except Exception as exc:  # noqa: BLE001 - surface any workflow failure to the client
-        raise HTTPException(status_code=503, detail=f"Agent workflow failed: {exc}") from exc
+    except AzureWorkflowError as exc:
+        raise HTTPException(status_code=exc.status_code, detail=exc.as_detail()) from exc
+    except TimeoutError as exc:
+        detail = {
+            "code": "AZURE_CONNECTION_FAILED",
+            "title": "Azure workflow timed out",
+            "message": "Azure did not finish the workflow before the configured timeout.",
+            "hint": "Retry the investigation or increase AZURE_AGENT_TIMEOUT_SECONDS.",
+        }
+        raise HTTPException(status_code=504, detail=detail) from exc

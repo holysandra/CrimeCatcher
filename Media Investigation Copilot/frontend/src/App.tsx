@@ -28,7 +28,23 @@ import type { AgentReport } from "@/types/agentReport";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
 
-type LoadedReport = AgentReport & { mode?: string };
+type LoadedReport = AgentReport & { mode: "live" };
+
+type WorkflowError = {
+  code: string;
+  title: string;
+  message: string;
+  hint?: string;
+};
+
+class WorkflowRequestError extends Error {
+  detail: WorkflowError;
+
+  constructor(detail: WorkflowError) {
+    super(detail.message);
+    this.detail = detail;
+  }
+}
 
 const STATUS_MESSAGES = [
   "Dispatching Azure agent workflow...",
@@ -44,7 +60,7 @@ export default function App() {
   const [report, setReport] = useState<LoadedReport | null>(null);
   const [loading, setLoading] = useState(false);
   const [statusIndex, setStatusIndex] = useState(0);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<WorkflowError | null>(null);
   const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
@@ -68,7 +84,11 @@ export default function App() {
     event?.preventDefault();
     const trimmed = query.trim();
     if (!trimmed) {
-      setError("Enter a company or person to investigate.");
+      setError({
+        code: "INPUT_REQUIRED",
+        title: "Enter a subject",
+        message: "Enter a company or person to investigate."
+      });
       return;
     }
 
@@ -85,7 +105,21 @@ export default function App() {
 
       if (!response.ok) {
         const problem = await response.json().catch(() => null);
-        throw new Error(problem?.detail ?? `Backend unavailable: ${response.status}`);
+        const detail = problem?.detail;
+        if (detail && typeof detail === "object") {
+          throw new WorkflowRequestError({
+            code: detail.code ?? "WORKFLOW_REQUEST_FAILED",
+            title: detail.title ?? "Investigation failed",
+            message: detail.message ?? `The backend returned status ${response.status}.`,
+            hint: detail.hint
+          });
+        }
+        throw new WorkflowRequestError({
+          code: "BACKEND_UNAVAILABLE",
+          title: "Investigation service unavailable",
+          message: typeof detail === "string" ? detail : `The backend returned status ${response.status}.`,
+          hint: "Check that the backend is running and can reach Azure."
+        });
       }
 
       const data = (await response.json()) as LoadedReport;
@@ -93,9 +127,14 @@ export default function App() {
     } catch (caught) {
       setReport(null);
       setError(
-        caught instanceof Error
-          ? caught.message
-          : "Agent workflow failed. Check that the backend is running and Azure is configured."
+        caught instanceof WorkflowRequestError
+          ? caught.detail
+          : {
+              code: "BACKEND_UNAVAILABLE",
+              title: "Cannot reach the investigation service",
+              message: caught instanceof Error ? caught.message : "The investigation request failed.",
+              hint: "Check that the backend is running and try again."
+            }
       );
     } finally {
       setLoading(false);
@@ -131,11 +170,7 @@ export default function App() {
           <SearchPanel query={query} setQuery={setQuery} loading={loading} investigate={investigate} />
         </section>
 
-        {error ? (
-          <div className="rounded-md border border-orange-200 bg-orange-50 p-3 text-sm text-orange-700 dark:border-orange-900 dark:bg-orange-950 dark:text-orange-200">
-            {error}
-          </div>
-        ) : null}
+        {error ? <WorkflowErrorPanel error={error} retry={() => investigate()} /> : null}
 
         <LoadingPanel loading={loading} status={STATUS_MESSAGES[statusIndex]} progress={progress} />
 
@@ -290,7 +325,8 @@ function SearchPanel({
         </form>
         <p className="text-xs leading-5 text-muted-foreground">
           Pressing run triggers the 4-agent Azure AI Foundry workflow. It returns a structured JSON report that populates
-          the dashboard below. Until Azure credentials are set in the backend, a bundled sample report is used.
+          the dashboard below. This screen uses live Azure results only and shows a blocking error if Azure cannot run the
+          configured workflow.
         </p>
       </CardContent>
     </Card>
@@ -309,6 +345,38 @@ function ResponsibleAiNotice() {
         from cited sources and should be validated by a human investigator.
       </div>
     </div>
+  );
+}
+
+function WorkflowErrorPanel({ error, retry }: { error: WorkflowError; retry: () => void }) {
+  const workflowMissing = error.code === "WORKFLOW_NOT_FOUND";
+  return (
+    <section
+      role="alert"
+      className="overflow-hidden rounded-xl border-2 border-red-600 bg-red-50 shadow-lg dark:border-red-500 dark:bg-red-950"
+    >
+      <div className="flex flex-col gap-5 p-6 sm:flex-row sm:items-start">
+        <div className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-red-600 text-white">
+          <AlertTriangle className="h-8 w-8" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-black uppercase tracking-[0.2em] text-red-700 dark:text-red-300">
+            {workflowMissing ? "Workflow configuration error" : "Live Azure investigation failed"}
+          </p>
+          <h2 className="mt-1 font-display text-2xl font-black text-red-950 dark:text-red-50">{error.title}</h2>
+          <p className="mt-2 text-base leading-7 text-red-900 dark:text-red-100">{error.message}</p>
+          {error.hint ? (
+            <div className="mt-4 rounded-lg border border-red-300 bg-white/70 p-3 text-sm leading-6 text-red-900 dark:border-red-800 dark:bg-black/20 dark:text-red-100">
+              <strong>How to fix it:</strong> {error.hint}
+            </div>
+          ) : null}
+          <p className="mt-3 font-mono text-xs font-semibold text-red-700 dark:text-red-300">Error code: {error.code}</p>
+        </div>
+        <Button type="button" variant="outline" onClick={retry} className="border-red-400 text-red-800 dark:text-red-100">
+          Retry live workflow
+        </Button>
+      </div>
+    </section>
   );
 }
 

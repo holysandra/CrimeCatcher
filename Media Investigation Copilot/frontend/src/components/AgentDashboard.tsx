@@ -680,13 +680,12 @@ function ChipList({ label, value }: { label: string; value: string }) {
   );
 }
 
-/** Small badge shown in the header to indicate live vs sample data. */
+/** Small badge shown in the header for validated Azure workflow data. */
 export function ModeBadge({ report }: { report: AgentReport & { mode?: string } }) {
-  const mode = report.mode === "live" ? "live" : "sample";
   return (
-    <Badge variant={mode === "live" ? "green" : "orange"}>
+    <Badge variant="green">
       <Bot className="mr-1 h-3 w-3" />
-      {mode === "live" ? "Live Azure agents" : "Sample data"}
+      Live Azure workflow
     </Badge>
   );
 }
