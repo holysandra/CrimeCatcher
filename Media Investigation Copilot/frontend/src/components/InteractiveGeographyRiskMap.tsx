@@ -138,8 +138,8 @@ export function InteractiveGeographyRiskMap({ investigation }: { investigation: 
               </svg>
               {hovered ? (
                 <div className="absolute left-3 top-3 max-w-xs rounded-md border bg-card/95 p-3 text-xs shadow-lg">
-                  <p className="font-semibold">{hovered.country}</p>
-                  <p className={cn("mt-1 font-semibold", riskColor(hovered.riskRating))}>{hovered.riskRating} risk</p>
+                  <p className="font-display font-semibold">{hovered.country}</p>
+                  <p className={cn("mt-1 font-display font-semibold", riskColor(hovered.riskRating))}>{hovered.riskRating} risk</p>
                   <p className="mt-1 text-muted-foreground">{hovered.findingCount} finding(s), {hovered.sourceCount} source(s)</p>
                   <p className="mt-1 text-muted-foreground">{hovered.typologies.slice(0, 3).join(", ") || "No typology mapped"}</p>
                 </div>
@@ -164,7 +164,7 @@ export function InteractiveGeographyRiskMap({ investigation }: { investigation: 
             {selected ? (
               <div className="rounded-lg border bg-background p-4">
                 <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2 font-semibold">
+                  <div className="flex items-center gap-2 font-display font-semibold">
                     <Globe2 className="h-4 w-4 text-primary" />
                     {selected.country}
                   </div>
@@ -185,7 +185,7 @@ export function InteractiveGeographyRiskMap({ investigation }: { investigation: 
                   {selected.findings.length ? selected.findings.map((finding) => (
                     <div key={finding.id} className="rounded-md border bg-card p-3">
                       <div className="flex flex-wrap items-center justify-between gap-2">
-                        <p className="text-sm font-semibold">{finding.title}</p>
+                        <p className="font-display text-sm font-semibold">{finding.title}</p>
                         <Badge variant={flagVariant(finding.flag)}>{finding.flag}</Badge>
                       </div>
                       <div className="mt-2 flex flex-wrap gap-2">

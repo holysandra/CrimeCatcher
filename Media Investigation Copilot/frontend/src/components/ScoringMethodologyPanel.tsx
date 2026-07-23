@@ -91,20 +91,20 @@ export function ScoringMethodologyPanel({ investigation }: { investigation: Enha
       <CardContent className="space-y-5 pt-5">
         <div className="grid gap-3 md:grid-cols-3">
           <div className="rounded-lg border bg-background p-4">
-            <p className="flex items-center gap-2 font-semibold"><Calculator className="h-4 w-4 text-primary" />Weighted Risk Score</p>
+            <p className="flex items-center gap-2 font-display font-semibold"><Calculator className="h-4 w-4 text-primary" />Weighted Risk Score</p>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
               Each evidence-supported finding maps to AFC/Fraud typologies. Base typology weights are multiplied by source reliability,
               status, evidence strength, recency, corroboration, entity match, and jurisdiction risk. The final score is capped at 100.
             </p>
           </div>
           <div className="rounded-lg border bg-background p-4">
-            <p className="flex items-center gap-2 font-semibold"><ShieldCheck className="h-4 w-4 text-primary" />Confidence Score</p>
+            <p className="flex items-center gap-2 font-display font-semibold"><ShieldCheck className="h-4 w-4 text-primary" />Confidence Score</p>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
               Confidence measures reliability of the result, separate from risk. A high-risk case may have medium confidence if evidence is severe but limited.
             </p>
           </div>
           <div className="rounded-lg border bg-background p-4">
-            <p className="flex items-center gap-2 font-semibold"><BookOpen className="h-4 w-4 text-primary" />Human Review</p>
+            <p className="flex items-center gap-2 font-display font-semibold"><BookOpen className="h-4 w-4 text-primary" />Human Review</p>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
               The model prioritizes analyst review. It does not make final compliance decisions or invent findings when sources are unavailable.
             </p>
@@ -112,7 +112,7 @@ export function ScoringMethodologyPanel({ investigation }: { investigation: Enha
         </div>
 
         <div className="rounded-lg border bg-background p-4 text-sm leading-6">
-          <p className="font-semibold">Formula</p>
+          <p className="font-display font-semibold">Formula</p>
           <pre className="mt-2 whitespace-pre-wrap font-sans text-muted-foreground">{`Adjusted Finding Score =
 Base Typology Weight x Source Reliability x Evidence Status x Evidence Strength x Recency x Corroboration x Entity Match x Jurisdiction
 
@@ -141,7 +141,7 @@ Sum of Adjusted Finding Scores + Pattern Bonus + Sector Risk Bonus - Mitigating 
         <div className="grid gap-4 lg:grid-cols-2">
           <MethodTable title="Pattern Bonus Rules" rows={patternBonusRows} />
           <div className="rounded-lg border bg-background p-4">
-            <p className="font-semibold">Current Pattern / Override Status</p>
+            <p className="font-display font-semibold">Current Pattern / Override Status</p>
             <div className="mt-3 flex flex-wrap gap-2">
               <Badge variant={investigation.riskScore.autoEscalationTriggers.length ? "red" : "secondary"}>
                 {investigation.riskScore.autoEscalationTriggers.length ? "Override applied" : "No override applied"}
@@ -166,7 +166,7 @@ Sum of Adjusted Finding Scores + Pattern Bonus + Sector Risk Bonus - Mitigating 
         </div>
 
         <div className="rounded-lg border bg-background p-4">
-          <p className="font-semibold">Confidence Breakdown</p>
+          <p className="font-display font-semibold">Confidence Breakdown</p>
           <div className="mt-3 grid gap-2 text-sm md:grid-cols-2">
             <ScoreLine label="Source Coverage" value={breakdown.sourceCoverage} max={25} />
             <ScoreLine label="Source Reliability" value={breakdown.sourceReliability} max={20} />
@@ -197,7 +197,7 @@ Sum of Adjusted Finding Scores + Pattern Bonus + Sector Risk Bonus - Mitigating 
 function MethodTable({ title, rows }: { title: string; rows: string[][] }) {
   return (
     <div className="overflow-hidden rounded-lg border bg-background">
-      <div className="border-b bg-secondary/60 px-4 py-3 font-semibold">{title}</div>
+      <div className="border-b bg-secondary/60 px-4 py-3 font-display font-semibold">{title}</div>
       <div className="max-h-72 overflow-auto">
         <table className="w-full text-left text-sm">
           <tbody>
