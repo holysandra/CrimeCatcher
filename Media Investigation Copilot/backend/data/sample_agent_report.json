@@ -1,0 +1,594 @@
+{
+  "case_id": "",
+  "input_name": "Binance",
+  "assessment_date": "2026-01-01",
+  "subject_reports": [
+    {
+      "subject_id": "S001",
+      "matched_name": "Binance",
+      "subject_type": "Entity",
+      "match_status": "Confirmed",
+      "identity_confidence": "High",
+      "final_profile": {
+        "profile_type": "Entity",
+        "sourced_profile_fields": [
+          {
+            "field_name": "legal_name",
+            "value": "Binance Group; no single global legal entity identified from the reviewed official sources",
+            "evidence_note": "Official Binance materials refer to the Binance Group and identify different Binance-affiliated legal entities by jurisdiction.",
+            "supporting_sources": [
+              {
+                "source_id": "P001",
+                "title": "About Binance",
+                "publisher": "Binance",
+                "url": "https://www.binance.com/en/about",
+                "retrieval_date": "2026-01-01",
+                "supported_information": "Identifies Binance as a global blockchain ecosystem and describes its Binance.com platform."
+              },
+              {
+                "source_id": "P002",
+                "title": "Licences, Registrations and Other Legal Matters",
+                "publisher": "Binance",
+                "url": "https://www.binance.com/en-GB/legal/licenses",
+                "retrieval_date": "2026-01-01",
+                "supported_information": "Lists multiple Binance-affiliated legal entities and jurisdiction-specific registrations."
+              }
+            ]
+          },
+          {
+            "field_name": "trading_names",
+            "value": [
+              "Binance",
+              "Binance.com"
+            ],
+            "evidence_note": "The official website presents Binance as the brand and identifies Binance.com as the global platform.",
+            "supporting_sources": [
+              {
+                "source_id": "P001",
+                "title": "About Binance",
+                "publisher": "Binance",
+                "url": "https://www.binance.com/en/about",
+                "retrieval_date": "2026-01-01",
+                "supported_information": "Identifies the Binance brand and its exchange platform."
+              },
+              {
+                "source_id": "P002",
+                "title": "Licences, Registrations and Other Legal Matters",
+                "publisher": "Binance",
+                "url": "https://www.binance.com/en-GB/legal/licenses",
+                "retrieval_date": "2026-01-01",
+                "supported_information": "Uses Binance group and entity names across jurisdiction-specific regulatory disclosures."
+              }
+            ]
+          },
+          {
+            "field_name": "entity_type_or_legal_form",
+            "value": "Global blockchain ecosystem and digital-asset exchange brand operating through multiple jurisdiction-specific legal entities",
+            "evidence_note": "Official Binance materials describe the business as a blockchain ecosystem and list separate corporate entities for regulated activities.",
+            "supporting_sources": [
+              {
+                "source_id": "P001",
+                "title": "About Binance",
+                "publisher": "Binance",
+                "url": "https://www.binance.com/en/about",
+                "retrieval_date": "2026-01-01",
+                "supported_information": "Describes Binance as a global blockchain ecosystem."
+              },
+              {
+                "source_id": "P002",
+                "title": "Licences, Registrations and Other Legal Matters",
+                "publisher": "Binance",
+                "url": "https://www.binance.com/en-GB/legal/licenses",
+                "retrieval_date": "2026-01-01",
+                "supported_information": "Identifies multiple jurisdiction-specific Binance entities."
+              }
+            ]
+          },
+          {
+            "field_name": "line_of_business",
+            "value": "Digital-asset exchange and blockchain infrastructure services",
+            "evidence_note": "Binance describes its mission as providing infrastructure for the blockchain ecosystem and identifies its digital-asset exchange as a core product.",
+            "supporting_sources": [
+              {
+                "source_id": "P001",
+                "title": "About Binance",
+                "publisher": "Binance",
+                "url": "https://www.binance.com/en/about",
+                "retrieval_date": "2026-01-01",
+                "supported_information": "Describes Binance's blockchain infrastructure and exchange activities."
+              }
+            ]
+          },
+          {
+            "field_name": "business_description",
+            "value": "A global blockchain ecosystem offering digital-asset trading, custody, payments, education, investment, research, and related Web3 services.",
+            "evidence_note": "The official About page lists the Binance Exchange, Labs, Launchpad, Academy, Research, Trust Wallet, Charity, NFT, and other ecosystem products.",
+            "supporting_sources": [
+              {
+                "source_id": "P001",
+                "title": "About Binance",
+                "publisher": "Binance",
+                "url": "https://www.binance.com/en/about",
+                "retrieval_date": "2026-01-01",
+                "supported_information": "Lists Binance's exchange, blockchain, education, research, wallet, NFT, and related ecosystem activities."
+              }
+            ]
+          },
+          {
+            "field_name": "products_or_services",
+            "value": [
+              "Spot digital-asset trading",
+              "Convert",
+              "Peer-to-peer trading",
+              "Margin trading",
+              "Trading bots",
+              "Staking and earn products",
+              "NFT marketplace",
+              "Launchpad",
+              "Binance Academy",
+              "Binance Research",
+              "Trust Wallet",
+              "Institutional and entity accounts"
+            ],
+            "evidence_note": "Products and services are identified on Binance's official About, platform, and entity-verification pages.",
+            "supporting_sources": [
+              {
+                "source_id": "P001",
+                "title": "About Binance",
+                "publisher": "Binance",
+                "url": "https://www.binance.com/en/about",
+                "retrieval_date": "2026-01-01",
+                "supported_information": "Identifies Binance ecosystem products and services."
+              },
+              {
+                "source_id": "P003",
+                "title": "How to Complete Entity Verification: A Step-by-Step Guide",
+                "publisher": "Binance",
+                "url": "https://www.binance.com/en/support/faq/detail/360015552032",
+                "retrieval_date": "2026-01-01",
+                "supported_information": "Describes entity and corporate account services."
+              }
+            ]
+          },
+          {
+            "field_name": "industry_or_sector",
+            "value": "Cryptocurrency, digital assets, blockchain and financial technology",
+            "evidence_note": "Official Binance materials identify digital assets, blockchain infrastructure, exchange services, custody, and related regulated activities.",
+            "supporting_sources": [
+              {
+                "source_id": "P001",
+                "title": "About Binance",
+                "publisher": "Binance",
+                "url": "https://www.binance.com/en/about",
+                "retrieval_date": "2026-01-01",
+                "supported_information": "Describes Binance's blockchain and digital-asset activities."
+              },
+              {
+                "source_id": "P002",
+                "title": "Licences, Registrations and Other Legal Matters",
+                "publisher": "Binance",
+                "url": "https://www.binance.com/en-GB/legal/licenses",
+                "retrieval_date": "2026-01-01",
+                "supported_information": "Lists regulatory permissions for digital-asset and related financial activities."
+              }
+            ]
+          },
+          {
+            "field_name": "operating_countries",
+            "value": [
+              "Global operations through jurisdiction-specific entities and registrations"
+            ],
+            "evidence_note": "Binance's official licenses page lists regulated entities and registrations across multiple jurisdictions, including Abu Dhabi Global Market, France, Italy, Spain, Poland, Sweden, and Mexico.",
+            "supporting_sources": [
+              {
+                "source_id": "P002",
+                "title": "Licences, Registrations and Other Legal Matters",
+                "publisher": "Binance",
+                "url": "https://www.binance.com/en-GB/legal/licenses",
+                "retrieval_date": "2026-01-01",
+                "supported_information": "Lists jurisdiction-specific entities, registrations, licenses, authorisations, and approvals."
+              }
+            ]
+          },
+          {
+            "field_name": "official_website",
+            "value": "https://www.binance.com/",
+            "evidence_note": "The cited official Binance pages are hosted on binance.com and identify Binance.com as the platform.",
+            "supporting_sources": [
+              {
+                "source_id": "P001",
+                "title": "About Binance",
+                "publisher": "Binance",
+                "url": "https://www.binance.com/en/about",
+                "retrieval_date": "2026-01-01",
+                "supported_information": "Official Binance website and platform identity."
+              },
+              {
+                "source_id": "P002",
+                "title": "Licences, Registrations and Other Legal Matters",
+                "publisher": "Binance",
+                "url": "https://www.binance.com/en-GB/legal/licenses",
+                "retrieval_date": "2026-01-01",
+                "supported_information": "Official Binance legal and regulatory website."
+              }
+            ]
+          },
+          {
+            "field_name": "subsidiaries",
+            "value": [
+              "Binance France SAS",
+              "Binance Italy S.R.L.",
+              "Binance Spain, S.L.",
+              "Binance Poland Spółka z Ograniczoną Odpowiedzialnością",
+              "Binance Nordics AB",
+              "Nest Exchange Limited",
+              "Nest Clearing and Custody Limited",
+              "BCI Limited"
+            ],
+            "evidence_note": "These entities are listed by Binance as group entities or regulated entities in the relevant jurisdictions. The list is not necessarily exhaustive.",
+            "supporting_sources": [
+              {
+                "source_id": "P002",
+                "title": "Licences, Registrations and Other Legal Matters",
+                "publisher": "Binance",
+                "url": "https://www.binance.com/en-GB/legal/licenses",
+                "retrieval_date": "2026-01-01",
+                "supported_information": "Lists Binance-affiliated entities and jurisdiction-specific legal entities."
+              }
+            ]
+          },
+          {
+            "field_name": "key_people",
+            "value": [
+              "Yi He — Co-Founder and Co-CEO",
+              "Changpeng Zhao — Co-Founder and Former CEO"
+            ],
+            "evidence_note": "Binance's official About page identifies Yi He as Co-CEO and Co-Founder and Changpeng Zhao as Co-Founder and Former CEO.",
+            "supporting_sources": [
+              {
+                "source_id": "P001",
+                "title": "About Binance",
+                "publisher": "Binance",
+                "url": "https://www.binance.com/en/about",
+                "retrieval_date": "2026-01-01",
+                "supported_information": "Identifies Binance's key people and leadership roles."
+              }
+            ]
+          },
+          {
+            "field_name": "regulatory_status_or_licenses",
+            "value": [
+              "Binance-affiliated entities are listed by Binance as holding registrations, licenses, authorisations, or approvals in multiple jurisdictions.",
+              "Examples include France DASP registration E2022-037, Italy DASP registration PSV5, Spain VASP registration D661, Poland VASP registration RDWW-465, Sweden registration 66822, and listed ADGM regulated entities."
+            ],
+            "evidence_note": "The official Binance licenses page provides the jurisdiction-specific regulatory information. Regulatory status may differ by entity, product, and jurisdiction.",
+            "supporting_sources": [
+              {
+                "source_id": "P002",
+                "title": "Licences, Registrations and Other Legal Matters",
+                "publisher": "Binance",
+                "url": "https://www.binance.com/en-GB/legal/licenses",
+                "retrieval_date": "2026-01-01",
+                "supported_information": "Lists jurisdiction-specific registrations, licenses, authorisations, and approvals."
+              }
+            ]
+          }
+        ],
+        "profile_summary": "Binance is a global digital-asset exchange and blockchain infrastructure brand operating through multiple jurisdiction-specific entities. Its publicly described activities include digital-asset trading, custody, payments, education, research, Web3, wallet, NFT, and institutional services. No single global legal entity, headquarters, incorporation jurisdiction, or group-wide ownership structure was established from the supplied sources."
+      },
+      "focal_geography": {
+        "primary_country": "",
+        "jurisdiction": "Multiple jurisdictions",
+        "business_locations": [
+          "Abu Dhabi Global Market",
+          "France",
+          "Italy",
+          "Spain",
+          "Poland",
+          "Sweden",
+          "Mexico"
+        ],
+        "geography_confidence": "Medium",
+        "geography_reason": "Binance's official regulatory page confirms operations or regulated entities in multiple jurisdictions but does not establish one global principal country or headquarters.",
+        "supporting_sources": [
+          {
+            "source_id": "P002",
+            "title": "Licences, Registrations and Other Legal Matters",
+            "publisher": "Binance",
+            "url": "https://www.binance.com/en-GB/legal/licenses",
+            "retrieval_date": "2026-01-01",
+            "supported_information": "Lists Binance-affiliated entities and registrations in multiple jurisdictions."
+          }
+        ]
+      },
+      "subject_risk_assessment": {
+        "subject_risk_score": 85,
+        "risk_level": "Critical",
+        "highest_matter_risk_score": 80,
+        "pattern_adjustment": 5,
+        "risk_calculation": "Highest scorable matter score 80 from M001, plus 5 points for two or more independent scorable matters: 80 + 5 = 85. Confidence was not used in the arithmetic.",
+        "risk_driving_matter_ids": [
+          "M001",
+          "M002"
+        ]
+      },
+      "matters": [
+        {
+          "matter_id": "M001",
+          "matter_summary": "Binance Holdings Limited pleaded guilty in the United States to Bank Secrecy Act and unlicensed money-transmission offenses and to violating the International Emergency Economic Powers Act. The matter was resolved through a criminal plea and monetary resolution exceeding $4 billion.",
+          "event_geography": {
+            "country": "United States",
+            "city_or_region": "Washington, D.C.",
+            "jurisdiction_or_authority": "U.S. Department of Justice; federal criminal proceedings"
+          },
+          "timeline": [
+            {
+              "date": "2023-11-21",
+              "event_type": "Resolution",
+              "stage": "CONFIRMED",
+              "description": "Binance Holdings Limited pleaded guilty to conspiracy to violate the Bank Secrecy Act and to fail to register as a money transmitting business, failure to register as a money transmitting business, and violating the International Emergency Economic Powers Act. Binance agreed to pay more than $4 billion.",
+              "supporting_sources": [
+                {
+                  "article_id": "A001",
+                  "title": "Binance and CEO Plead Guilty to Federal Charges in $4B Resolution",
+                  "publisher": "U.S. Department of Justice",
+                  "publication_date": "2023-11-21",
+                  "url": "https://www.justice.gov/archives/opa/pr/binance-and-ceo-plead-guilty-federal-charges-4b-resolution",
+                  "supports": "The confirmed guilty plea, offenses, and monetary resolution involving Binance Holdings Limited."
+                }
+              ]
+            }
+          ],
+          "current_stage": "CONFIRMED",
+          "typologies": [
+            "Money Laundering",
+            "Sanctions Evasion"
+          ],
+          "attribution": "Direct",
+          "confidence": "High",
+          "risk_components": {
+            "typology_score": 40,
+            "stage_score": 40,
+            "attribution_adjustment": 0,
+            "recency_adjustment": 0
+          },
+          "matter_risk_score": 80,
+          "risk_level": "Critical",
+          "risk_calculation": "40 typology + 40 confirmed stage + 0 direct attribution + 0 recency = 80.",
+          "key_evidence": "The U.S. Department of Justice reported that Binance Holdings Limited pleaded guilty and agreed to pay more than $4 billion to resolve the investigation.",
+          "key_facts": "The confirmed resolution involved Bank Secrecy Act violations, failure to register as a money transmitting business, and violations of the International Emergency Economic Powers Act.",
+          "supporting_sources": [
+            {
+              "article_id": "A001",
+              "title": "Binance and CEO Plead Guilty to Federal Charges in $4B Resolution",
+              "publisher": "U.S. Department of Justice",
+              "publication_date": "2023-11-21",
+              "url": "https://www.justice.gov/archives/opa/pr/binance-and-ceo-plead-guilty-federal-charges-4b-resolution",
+              "supports": "Binance Holdings Limited's guilty plea and payment exceeding $4 billion."
+            }
+          ]
+        },
+        {
+          "matter_id": "M002",
+          "matter_summary": "The CFTC brought a civil enforcement action alleging that Binance and related entities operated an illegal digital-asset derivatives exchange and willfully evaded U.S. law. A federal court later entered an order requiring Binance to pay $2.7 billion and imposing permanent injunctive relief.",
+          "event_geography": {
+            "country": "United States",
+            "city_or_region": "Washington, D.C.; Chicago, Illinois",
+            "jurisdiction_or_authority": "U.S. Commodity Futures Trading Commission; U.S. District Court for the Northern District of Illinois"
+          },
+          "timeline": [
+            {
+              "date": "2023-03-27",
+              "event_type": "Charge",
+              "stage": "FORMAL",
+              "description": "The CFTC filed a civil enforcement action alleging that Binance operated an illegal digital-asset derivatives exchange, acted as an unregistered futures commission merchant, and willfully evaded U.S. law.",
+              "supporting_sources": [
+                {
+                  "article_id": "A002",
+                  "title": "CFTC Charges Binance and Its Founder, Changpeng Zhao, with Willful Evasion of Federal Law and Operating an Illegal Digital Asset Derivatives Exchange",
+                  "publisher": "U.S. Commodity Futures Trading Commission",
+                  "publication_date": "2023-03-27",
+                  "url": "https://www.cftc.gov/PressRoom/PressReleases/8680-23",
+                  "supports": "The formal CFTC allegations against Binance and related entities."
+                }
+              ]
+            },
+            {
+              "date": "2023-12-18",
+              "event_type": "Resolution",
+              "stage": "CONFIRMED",
+              "description": "A federal court entered an order concluding the CFTC enforcement action. Binance was required to pay $2.7 billion, and the order permanently enjoined Binance from specified violations of the Commodity Exchange Act and related requirements.",
+              "supporting_sources": [
+                {
+                  "article_id": "A003",
+                  "title": "Federal Court Enters Order Against Binance and Former CEO, Zhao, Concluding CFTC Enforcement Action",
+                  "publisher": "U.S. Commodity Futures Trading Commission",
+                  "publication_date": "2023-12-18",
+                  "url": "https://www.cftc.gov/PressRoom/PressReleases/8837-23",
+                  "supports": "The confirmed federal court order, $2.7 billion payment, and permanent injunctive relief."
+                }
+              ]
+            }
+          ],
+          "current_stage": "CONFIRMED",
+          "typologies": [
+            "Fraud"
+          ],
+          "attribution": "Direct",
+          "confidence": "High",
+          "risk_components": {
+            "typology_score": 25,
+            "stage_score": 40,
+            "attribution_adjustment": 0,
+            "recency_adjustment": 0
+          },
+          "matter_risk_score": 65,
+          "risk_level": "Critical",
+          "risk_calculation": "25 typology + 40 confirmed stage + 0 direct attribution + 0 recency = 65.",
+          "key_evidence": "The CFTC reported both the original enforcement action and the subsequent federal court order imposing a $2.7 billion payment and permanent injunction.",
+          "key_facts": "The matter began as a formal civil enforcement action on March 27, 2023 and concluded with a federal court order on December 18, 2023. The formal allegations should not be described as independently confirmed misconduct beyond the confirmed court resolution.",
+          "supporting_sources": [
+            {
+              "article_id": "A002",
+              "title": "CFTC Charges Binance and Its Founder, Changpeng Zhao, with Willful Evasion of Federal Law and Operating an Illegal Digital Asset Derivatives Exchange",
+              "publisher": "U.S. Commodity Futures Trading Commission",
+              "publication_date": "2023-03-27",
+              "url": "https://www.cftc.gov/PressRoom/PressReleases/8680-23",
+              "supports": "The formal civil enforcement allegations."
+            },
+            {
+              "article_id": "A003",
+              "title": "Federal Court Enters Order Against Binance and Former CEO, Zhao, Concluding CFTC Enforcement Action",
+              "publisher": "U.S. Commodity Futures Trading Commission",
+              "publication_date": "2023-12-18",
+              "url": "https://www.cftc.gov/PressRoom/PressReleases/8837-23",
+              "supports": "The confirmed resolution, monetary payment, and injunction."
+            }
+          ]
+        },
+        {
+          "matter_id": "M003",
+          "matter_summary": "The SEC filed a civil enforcement action against Binance entities and Changpeng Zhao alleging unregistered securities-related activities, misrepresentation of trading controls, and other securities-law violations. Emergency relief was granted in 2023, but the SEC later dismissed the civil enforcement action with prejudice on May 29, 2025.",
+          "event_geography": {
+            "country": "United States",
+            "city_or_region": "Washington, D.C.",
+            "jurisdiction_or_authority": "U.S. Securities and Exchange Commission; U.S. District Court for the District of Columbia"
+          },
+          "timeline": [
+            {
+              "date": "2023-06-05",
+              "event_type": "Charge",
+              "stage": "FORMAL",
+              "description": "The SEC filed 13 charges against Binance entities and Changpeng Zhao, including allegations concerning unregistered exchanges, broker-dealers, and clearing agencies; misrepresentation of trading controls and oversight on Binance.US; and unregistered offers and sales of securities.",
+              "supporting_sources": [
+                {
+                  "article_id": "A004",
+                  "title": "SEC Files 13 Charges Against Binance Entities and Founder Changpeng Zhao",
+                  "publisher": "U.S. Securities and Exchange Commission",
+                  "publication_date": "2023-06-05",
+                  "url": "https://www.sec.gov/newsroom/press-releases/2023-101-sec-files-13-charges-against-binance-entities-founder-changpeng-zhao",
+                  "supports": "The formal SEC allegations."
+                }
+              ]
+            },
+            {
+              "date": "2023-06-17",
+              "event_type": "Enforcement",
+              "stage": "FORMAL",
+              "description": "The SEC obtained emergency relief requiring defendants to repatriate to the United States assets held for Binance.US customers and to maintain control of those assets in the United States.",
+              "supporting_sources": [
+                {
+                  "article_id": "A005",
+                  "title": "SEC Secures Emergency Relief to Protect Binance.US Customers’ Assets",
+                  "publisher": "U.S. Securities and Exchange Commission",
+                  "publication_date": "2023-06-17",
+                  "url": "https://www.sec.gov/newsroom/press-releases/2023-110-sec-secures-emergency-relief-protect-binanceus-customers-assets",
+                  "supports": "The emergency relief and asset-control requirements."
+                }
+              ]
+            },
+            {
+              "date": "2025-05-29",
+              "event_type": "Resolution",
+              "stage": "CLEARED",
+              "description": "The SEC stated that it filed a joint stipulation with Binance entities and Changpeng Zhao to dismiss with prejudice the civil enforcement action filed in June 2023.",
+              "supporting_sources": [
+                {
+                  "article_id": "A007",
+                  "title": "SEC Announces Dismissal of Civil Enforcement Action Against Binance Entities and Founder Changpeng Zhao",
+                  "publisher": "U.S. Securities and Exchange Commission",
+                  "publication_date": "2025-05-29",
+                  "url": "https://www.sec.gov/enforcement-litigation/litigation-releases/lr-26316",
+                  "supports": "The favorable procedural resolution dismissing the civil enforcement action with prejudice."
+                }
+              ]
+            }
+          ],
+          "current_stage": "CLEARED",
+          "typologies": [
+            "Fraud"
+          ],
+          "attribution": "Related",
+          "confidence": "High",
+          "risk_components": {
+            "typology_score": 0,
+            "stage_score": 0,
+            "attribution_adjustment": 0,
+            "recency_adjustment": 0
+          },
+          "matter_risk_score": 0,
+          "risk_level": "Minimal",
+          "risk_calculation": "CLEARED matter: final score is 0 under the required formula.",
+          "key_evidence": "The SEC reported formal charges and emergency relief in 2023, followed by dismissal with prejudice of the civil enforcement action on May 29, 2025.",
+          "key_facts": "The matter concerned Binance entities and related U.S. entities. The later dismissal is a favorable resolution and the earlier allegations must not be described as confirmed misconduct.",
+          "supporting_sources": [
+            {
+              "article_id": "A004",
+              "title": "SEC Files 13 Charges Against Binance Entities and Founder Changpeng Zhao",
+              "publisher": "U.S. Securities and Exchange Commission",
+              "publication_date": "2023-06-05",
+              "url": "https://www.sec.gov/newsroom/press-releases/2023-101-sec-files-13-charges-against-binance-entities-founder-changpeng-zhao",
+              "supports": "The formal SEC allegations."
+            },
+            {
+              "article_id": "A005",
+              "title": "SEC Secures Emergency Relief to Protect Binance.US Customers’ Assets",
+              "publisher": "U.S. Securities and Exchange Commission",
+              "publication_date": "2023-06-17",
+              "url": "https://www.sec.gov/newsroom/press-releases/2023-110-sec-secures-emergency-relief-protect-binanceus-customers-assets",
+              "supports": "The emergency relief issued during the litigation."
+            },
+            {
+              "article_id": "A007",
+              "title": "SEC Announces Dismissal of Civil Enforcement Action Against Binance Entities and Founder Changpeng Zhao",
+              "publisher": "U.S. Securities and Exchange Commission",
+              "publication_date": "2025-05-29",
+              "url": "https://www.sec.gov/enforcement-litigation/litigation-releases/lr-26316",
+              "supports": "The favorable dismissal with prejudice."
+            }
+          ]
+        }
+      ],
+      "excluded_matters": [
+        {
+          "matter_id": "A006",
+          "reason": "No AFC wrongdoing; the article described supervisory requirements imposed on Binance Markets Limited rather than a specified AFC typology."
+        }
+      ],
+      "plain_english_summary": {
+        "subject_profile_summary": "Binance is a global cryptocurrency and blockchain-services brand operating through multiple jurisdiction-specific entities. Its services include digital-asset exchange, custody, payments, staking, institutional accounts, research, education, wallet, NFT, and other Web3 activities.",
+        "geography_summary": "The focal geography is multinational. The supplied profile identifies operations or regulated entities in Abu Dhabi Global Market, France, Italy, Spain, Poland, Sweden, and Mexico. The adverse matters occurred primarily in the United States, with one excluded supervisory matter in the United Kingdom.",
+        "overall_risk_assessment": "The calculated subject risk score is 85, Critical. The score is driven primarily by the confirmed U.S. Department of Justice criminal resolution involving Binance Holdings Limited and the confirmed CFTC enforcement resolution. The SEC matter is currently classified as CLEARED and contributes zero matter-risk points.",
+        "timeline_summary": "The principal timeline runs from the CFTC formal action on March 27, 2023, through SEC formal charges and emergency relief in June 2023, the DOJ guilty plea on November 21, 2023, the CFTC court resolution on December 18, 2023, and the SEC dismissal with prejudice on May 29, 2025.",
+        "main_risk_drivers": "The main risk drivers are the confirmed Bank Secrecy Act, unlicensed money-transmission, and IEEPA-related guilty plea and the confirmed CFTC resolution involving a $2.7 billion payment and permanent injunction. These matters were attributed directly to Binance entities identified in the source material.",
+        "confidence_note": "Evidence confidence is High for the principal matters because the sources are official U.S. government and regulatory publications. Confidence is separate from risk severity and was not used in the score calculation."
+      },
+      "limitations": [
+        "The input identifies a brand and global business group rather than a uniquely specified legal entity.",
+        "Binance operates through multiple jurisdiction-specific companies; the cited proceedings may concern Binance Holdings Limited, Binance-affiliated entities, Binance Markets Limited, Binance.US entities, or other related parties rather than every entity using the Binance name.",
+        "The SEC civil enforcement action was dismissed with prejudice on May 29, 2025; the earlier SEC allegations are included with that subsequent procedural development.",
+        "The FCA action concerned Binance Markets Limited and was excluded because the supplied article described supervisory restrictions rather than AFC wrongdoing.",
+        "No single group-wide parent company, incorporation jurisdiction, registered address, or ultimate beneficial ownership structure was established from the supplied profile sources.",
+        "The output does not make an onboarding, offboarding, guilt, SAR-filing, or final compliance decision."
+      ],
+      "human_review": {
+        "human_review_required": true,
+        "review_reasons": [
+          "The subject is a global brand and business group with multiple legal entities, so entity-level attribution should be verified.",
+          "The DOJ and CFTC matters are material confirmed matters requiring review of the specific legal entities, products, jurisdictions, and applicable restrictions.",
+          "The SEC matter was formally alleged and later dismissed with prejudice; reviewers should distinguish the historical allegations from the favorable resolution.",
+          "The typology mapping is constrained by the specified taxonomy and should be independently reviewed for the intended compliance use."
+        ]
+      },
+      "final_conclusion": "Binance is assessed at Critical subject-level risk with a score of 85. The result is driven by two independent confirmed matters: the 2023 U.S. Department of Justice criminal resolution involving Bank Secrecy Act, unlicensed money-transmission, and IEEPA-related violations, and the 2023 CFTC enforcement resolution involving a $2.7 billion payment and permanent injunction. The SEC civil enforcement matter is classified as CLEARED following dismissal with prejudice on May 29, 2025 and contributes no matter-risk points. Human review is required, particularly to confirm the relevant Binance legal entity and the applicability of each matter to the intended relationship or jurisdiction."
+    }
+  ],
+  "qa_status": "Passed with Warnings",
+  "qa_warnings": [
+    "The supplied assessment date was not explicitly provided; 2026-01-01 was retained from the supplied source retrieval dates for report completion.",
+    "The Binance brand and group do not identify one unique legal entity. Matter attribution is therefore entity-specific and should not automatically be extended to every Binance-affiliated entity.",
+    "The supplied profile contains an individual_profile object even though subject_type is Entity; it was preserved as received but not used as the final profile type.",
+    "The supplied source data describes the SEC matter as dismissed with prejudice on May 29, 2025; this was treated as a CLEARED favorable resolution and not as confirmed misconduct.",
+    "No independent duplicate matter was created for related articles describing the same SEC, CFTC, or DOJ proceedings."
+  ]
+}

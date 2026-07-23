@@ -5,7 +5,10 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from models.schemas import InvestigationRequest, InvestigationResponse
+from typing import Any
+
+from models.schemas import AgentInvestigationRequest, InvestigationRequest, InvestigationResponse
+from services.azure_agents import run_agent_investigation
 from services.live_investigation import run_live_investigation
 
 
@@ -48,3 +51,16 @@ async def investigate(request: InvestigationRequest) -> InvestigationResponse:
         )
     except RuntimeError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+
+@app.post("/agents/investigate")
+async def agents_investigate(request: AgentInvestigationRequest) -> dict[str, Any]:
+    """Run the 4-agent Azure AI Foundry workflow and return its JSON report.
+
+    Returns the agent report as-is (with an added "mode" field: "live" when the
+    Azure workflow ran, or "sample" when Azure isn't configured yet).
+    """
+    try:
+        return await run_agent_investigation(request.company)
+    except Exception as exc:  # noqa: BLE001 - surface any workflow failure to the client
+        raise HTTPException(status_code=503, detail=f"Agent workflow failed: {exc}") from exc

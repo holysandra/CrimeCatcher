@@ -20,6 +20,12 @@ class InvestigationRequest(BaseModel):
     lookback_days: Optional[int] = Field(default=1095, ge=1, le=3650)
 
 
+class AgentInvestigationRequest(BaseModel):
+    """Request body for the Azure AI Foundry 4-agent workflow."""
+
+    company: str = Field(..., min_length=2, max_length=160)
+
+
 class TimelineEvent(BaseModel):
     year: str
     title: str
